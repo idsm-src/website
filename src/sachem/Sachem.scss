@@ -1,0 +1,85 @@
+.sachem-search {
+  max-width: 1350px !important;
+
+  #ketcher {
+    @import "./ketcher.scss";
+
+    .TopToolbar-module_recognize__mEhId {
+      display: none;
+    }
+
+    .ActionButton-module_button__1aDHe[title="Help (?)"] {
+        display: none;
+    }
+  }
+
+  .without-height {
+    height: auto !important;
+  }
+
+  .input-range__label--min, .input-range__label--max {
+     display: none;
+  }
+
+  .input-range__label {
+    color: rgb(33, 37, 41);
+    font-family: inherit !important;
+    font-size: inherit !important;
+  }
+
+  .input-range__label--value {
+    top: -2.1rem !important;
+  }
+}
+
+
+.sachem-results {
+  max-width: 1350px !important;
+
+  .compound-card {
+    width: 190px;
+    margin: 15px;
+
+    .spinner {
+      width: 1em;
+      height: 1em;
+    }
+
+    .card-img-top {
+      width: 160px;
+      height: 160px;
+      margin: 0px 15px 15px 15px;
+    }
+
+    .card-body {
+      padding: 1.25rem 0px !important;
+    }
+  }
+
+  .c-pointer {
+    cursor: pointer;
+  }
+
+  .spinner {
+    width: 4em;
+    height: 4em;
+  }
+
+  pre {
+    font-size: 80%;
+  }
+
+  .warning {
+    margin-left: 1em;
+  }
+}
+
+.compound-tooltip {
+  max-width: 450px !important;
+
+  img {
+    width: 420px;
+    height: 420px;
+    margin: 15px;
+  }
+}
