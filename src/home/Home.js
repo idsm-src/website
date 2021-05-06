@@ -110,17 +110,13 @@ function CardsRow() {
       </Col>
 
       <Col className="text-center d-flex flex-column mt-5">
-        <LinkContainer to="/chemweb">
-          <Button variant="link"><Image src={chemwebIcon} width={140} height={140} roundedCircle/><h2>ChemWebRDF</h2></Button>
-        </LinkContainer>
+        <Button href="/chemweb" variant="link"><Image src={chemwebIcon} width={140} height={140} roundedCircle/><h2>ChemWebRDF</h2></Button>
         <p className="text-justify flex-grow-1">
           PubChem RDF data exposed and searchable through an interoperable, semantic interface, using a custom
           high-performance SPARQL endpoint implementation. The service is still under development, but may already be
           used for processing many complicated queries.
         </p>
-        <LinkContainer to="/chemweb">
-          <Button variant="secondary">ChemWebRDF app <Icon icon={faAngleDoubleRight}/></Button>
-        </LinkContainer>
+        <Button href="/chemweb" variant="secondary">ChemWebRDF app <Icon icon={faAngleDoubleRight}/></Button>
       </Col>
     </Row>
   );

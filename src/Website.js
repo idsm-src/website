@@ -9,7 +9,6 @@ import { faAtom, faNetworkWired, faDatabase, faHome} from "@fortawesome/free-sol
 import Home from "./home/Home"
 import Sachem from "./sachem/Sachem"
 import Sparql from "./sparql/Sparql"
-import ChemWeb from "./chemweb/ChemWeb"
 
 import idsmLogo from "./logo-idsm.svg";
 import elixirLogo from "./logo-elixir.png";
@@ -118,7 +117,7 @@ function Website() {
           <Nav activeKey={window.location.pathname} className="mr-auto">
             <LinkContainer to="/sachem"><NavLink><Icon icon={faAtom}/> Sachem GUI</NavLink></LinkContainer>
             <LinkContainer to="/sparql"><NavLink><Icon icon={faNetworkWired}/> SPARQL GUI</NavLink></LinkContainer>
-            <LinkContainer to="/chemweb"><NavLink><Icon icon={faDatabase}/> ChemWebRDF</NavLink></LinkContainer>
+            <NavLink href="/chemweb"><Icon icon={faDatabase}/> ChemWebRDF</NavLink>
           </Nav>
           <Nav>
             <NavLink target="_blank" rel="noreferrer" href="https://bioinformatics.group.uochb.cz/en">
@@ -132,7 +131,6 @@ function Website() {
         <Switch>
           <Route path="/sachem"><Helmet><title>IDSM / Sachem GUI</title></Helmet><Sachem/></Route>
           <Route path="/sparql"><Helmet><title>IDSM / SPARQL GUI</title></Helmet><Sparql/></Route>
-          <Route path="/chemweb"><Helmet><title>IDSM / ChemWebRDF</title></Helmet><ChemWeb/></Route>
           <Route path="/"><Helmet><title>IDSM - Integrated Database of Small Molecules</title></Helmet><Home/></Route>
         </Switch>
       </div>
