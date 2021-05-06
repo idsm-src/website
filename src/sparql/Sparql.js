@@ -3,6 +3,8 @@ import { Container, Row, Col, Accordion, Card, Button } from "react-bootstrap";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faBook, faInfoCircle, faServer, faPlay, faEdit } from "@fortawesome/free-solid-svg-icons";
 
+import { trackPageView } from "../matomo.js"
+
 import Yasgui from "./Yasgui"
 import Statistics from "./Statistics"
 import Status from "./Status"
@@ -14,6 +16,10 @@ import "./Sparql.scss";
 
 
 function Sparql() {
+  React.useEffect(() => {
+    document.title = "IDSM / SPARQL GUI";
+    trackPageView();
+  }, []);
 
   const yasgui = React.useRef(null);
 

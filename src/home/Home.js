@@ -4,6 +4,8 @@ import { LinkContainer } from "react-router-bootstrap"
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleRight } from "@fortawesome/free-solid-svg-icons";
 
+import { trackPageView } from "../matomo.js"
+
 import idsmImage from './carousel-compounds.jpg';
 import sachemImage from './carousel-model.jpg';
 import rheaImage from './carousel-reactions.jpg';
@@ -17,6 +19,11 @@ import "./Home.scss";
 
 
 function HomeCarousel() {
+  React.useEffect(() => {
+    document.title = "IDSM - Integrated Database of Small Molecules";
+    trackPageView();
+  }, []);
+
   return (
     <Carousel indicators={false} className="d-none d-lg-block">
       <Carousel.Item style={{backgroundImage: `url(${idsmImage})`, backgroundSize: 'cover'}}>

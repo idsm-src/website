@@ -4,11 +4,17 @@ import { HashRouter as Router, Switch, Route, Redirect, useParams } from "react-
 import Search from "./Search.js";
 import Results from "./Results.js";
 import { parseHash } from "./hash.js";
+import { trackPageView } from "../matomo.js"
 
 import "./Sachem.scss"
 
 
 function Sachem() {
+  React.useEffect(() => {
+    document.title = "IDSM / Sachem GUI";
+    trackPageView();
+  }, []);
+
   return (
     <Router>
       <Switch>

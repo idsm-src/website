@@ -2,13 +2,13 @@ import React from "react";
 import { Navbar, Nav, NavLink, NavbarBrand, Container, Row, Col, Modal, Image, Button } from "react-bootstrap";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap"
-import { Helmet } from "react-helmet";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAtom, faNetworkWired, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
 
 import Home from "./home/Home"
 import Sachem from "./sachem/Sachem"
 import Sparql from "./sparql/Sparql"
+import { initMatomo } from "./matomo.js"
 
 import idsmLogo from "./logo-idsm.svg";
 import elixirLogo from "./logo-elixir.png";
@@ -108,6 +108,10 @@ function Contacts() {
 
 
 function Website() {
+  React.useEffect(() => {
+    initMatomo();
+  }, []);
+
   return (
     <BrowserRouter>
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -129,9 +133,9 @@ function Website() {
 
       <div className="page">
         <Switch>
-          <Route path="/sachem"><Helmet><title>IDSM / Sachem GUI</title></Helmet><Sachem/></Route>
-          <Route path="/sparql"><Helmet><title>IDSM / SPARQL GUI</title></Helmet><Sparql/></Route>
-          <Route path="/"><Helmet><title>IDSM - Integrated Database of Small Molecules</title></Helmet><Home/></Route>
+          <Route path="/sachem"><Sachem/></Route>
+          <Route path="/sparql"><Sparql/></Route>
+          <Route path="/"><Home/></Route>
         </Switch>
       </div>
 
