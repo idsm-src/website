@@ -175,10 +175,10 @@ function Results(props) {
       </div>
 
       {lastReached && !errorMsg && !loading && results.length > 0 &&
-        <center>
+        <div className="mt-4 text-center">
           <hr/>
           <div className="mt-4">No more results</div>
-        </center>
+        </div>
       }
 
       {lastReached && !errorMsg && !loading && results.length === 0 &&
@@ -190,18 +190,18 @@ function Results(props) {
       }
 
       {loading &&
-        <center className="mt-4">
-          <Spinner animation="border" variant="primary" className="spinner d-block"/>
+        <div className="mt-4 text-center">
+          <Spinner animation="border" variant="primary" className="spinner d-block ml-auto mr-auto"/>
           <p className="mt-3">Searching...</p>
-        </center>
+        </div>
       }
 
       {!loading && !errorMsg && !lastReached &&
-        <center>
+        <div className="text-center">
           <Button onClick={loadMoreResults} variant="primary" className="mt-3">
             Load more results
           </Button>
-        </center>
+        </div>
       }
     </Container>
   );
