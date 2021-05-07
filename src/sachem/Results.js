@@ -82,10 +82,25 @@ function Results(props) {
   const [lastReached, setLastReached] = React.useState(false);
   const [showWarnings, setShowWarnings] = React.useState(true);
 
-  function loadResults() {
+  function loadFirstResults() {
+    search(props.query, props.params, 0, queryLimit)
+    .then(result => {
+      setLoading(false);
+      setLastReached(result.done);
+      setResults(result.compounds);
+      setWarnings(result.warnings);
+    })
+    .catch(err => {
+      setLoading(false);
+      setLastReached(true);
+      setErrorMsg(err.toString());
+    });
+  }
+
+  function loadMoreResults() {
     setLoading(true);
 
-    search(props.query, props.params, 0, queryLimit)
+    search(props.query, props.params, results.length, queryLimit)
     .then(result => {
       setLoading(false);
       setLastReached(result.done);
@@ -99,7 +114,7 @@ function Results(props) {
     });
   }
 
-  React.useEffect(loadResults, [props, queryLimit]);
+  React.useEffect(loadFirstResults, [props, queryLimit]);
 
   return (
     <Container className="sachem-results">
@@ -183,7 +198,7 @@ function Results(props) {
 
       {!loading && !errorMsg && !lastReached &&
         <center>
-          <Button onClick={loadResults} variant="primary" className="mt-3">
+          <Button onClick={loadMoreResults} variant="primary" className="mt-3">
             Load more results
           </Button>
         </center>
