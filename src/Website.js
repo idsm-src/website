@@ -1,13 +1,12 @@
 import React from "react";
-import { Navbar, Nav, NavLink, NavbarBrand, Container, Row, Col, Modal, Image, Button } from "react-bootstrap";
+import { Suspense } from "react";
+import { Navbar, Nav, NavLink, NavbarBrand, Container, Row, Col, Modal, Image, Button, Spinner } from "react-bootstrap";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap"
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAtom, faNetworkWired, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
 
-import Home from "./home/Home"
-import Sachem from "./sachem/Sachem"
-import Sparql from "./sparql/Sparql"
+import ErrorBoundary from "./ErrorBoundary.js"
 import { initMatomo } from "./matomo.js"
 
 import idsmLogo from "./logo-idsm.svg";
@@ -15,6 +14,11 @@ import elixirLogo from "./logo-elixir.png";
 import uochbLogo from "./logo-uochb.png";
 
 import "./Website.scss";
+
+
+const Home = React.lazy(() => import("./home/Home"));
+const Sachem = React.lazy(() => import("./sachem/Sachem"));
+const Sparql = React.lazy(() => import("./sparql/Sparql"));
 
 
 function DataPrivacy() {
@@ -132,11 +136,15 @@ function Website() {
       </Navbar>
 
       <div className="page">
-        <Switch>
-          <Route path="/sachem"><Sachem/></Route>
-          <Route path="/sparql"><Sparql/></Route>
-          <Route path="/"><Home/></Route>
-        </Switch>
+        <ErrorBoundary>
+          <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
+            <Switch>
+              <Route path="/sachem" component={Sachem}/>
+              <Route path="/sparql" component={Sparql}/>
+              <Route path="/" component={Home}/>
+            </Switch>
+          </Suspense>
+        </ErrorBoundary>
       </div>
 
       <Container fluid className="pt-1 mt-5 footer">
