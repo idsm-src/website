@@ -160,14 +160,20 @@ function DatabaseRow() {
         </p>
         <ul>
           <li className="text-justify">
-            Kratochvíl, M., Vondrášek, J. & Galgonek, J.
-            Interoperable chemical structure search service.{' '}
+            Galgonek, J. & Vondrášek, J.{' '}
+            <b>IDSM ChemWebRDF: SPARQLing small-molecule datasets.</b>{' '}
+            <em>Journal of Cheminformatics</em> <b>13</b>, 38 (2021).{' '}
+            <a target="_blank" rel="noreferrer" href="https://doi.org/10.1186/s13321-021-00515-1">doi:10.1186/s13321-021-00515-1</a>
+          </li>
+          <li className="text-justify">
+            Kratochvíl, M., Vondrášek, J. & Galgonek, J.{' '}
+            <b>Interoperable chemical structure search service.</b>{' '}
             <em>Journal of Cheminformatics</em> <b>11</b>, 45 (2019).{' '}
             <a target="_blank" rel="noreferrer" href="https://doi.org/10.1186/s13321-019-0367-2">doi:10.1186/s13321-019-0367-2</a>
           </li>
           <li className="text-justify">
-            Kratochvíl, M., Vondrášek, J. & Galgonek, J.
-            Sachem: a chemical cartridge for high-performance substructure search.{' '}
+            Kratochvíl, M., Vondrášek, J. & Galgonek, J.{' '}
+            <b>Sachem: a chemical cartridge for high-performance substructure search.</b>{' '}
             <em>Journal of Cheminformatics</em> <b>10</b>, 27 (2018).{' '}
             <a target="_blank" rel="noreferrer" href="https://doi.org/10.1186/s13321-018-0282-y">doi:10.1186/s13321-018-0282-y</a>
           </li>
