@@ -26,7 +26,7 @@ function Sparql() {
   return (
     <Container fluid className="mt-3">
       <Row>
-        <Col xs={3} className="sparql-panel">
+        <Col xl={3} lg={4} md={5} sm={12} className="sparql-panel mb-4">
 
           <h2>IDSM SPARQL endpoints</h2>
           <p className="text-justify">
@@ -107,7 +107,7 @@ function Sparql() {
           </Accordion>
         </Col>
 
-        <Col xs={9}>
+        <Col xl={9} lg={8} md={7} sm={12}>
           <Yasgui ref={yasgui} endpoints={endpoints} defaultEndpoint={defaultEndpoint} defaultQuery={defaultQuery}/>
         </Col>
       </Row>
