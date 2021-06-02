@@ -107,7 +107,7 @@ function Sparql() {
           </Accordion>
         </Col>
 
-        <Col xl={9} lg={8} md={7} sm={12}>
+        <Col xl={9} lg={8} md={7} sm={12} style={{position: "inherit"}}>
           <Yasgui ref={yasgui} endpoints={endpoints} defaultEndpoint={defaultEndpoint} defaultQuery={defaultQuery}/>
         </Col>
       </Row>
