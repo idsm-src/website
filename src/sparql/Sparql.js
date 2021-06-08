@@ -33,7 +33,7 @@ function Sparql() {
             This page allows you to access the IDSM functionality through a SPARQL web-interface (on the right), and connect the search results to the data from other services. For a quick start, you may select a query example from the list below.
           </p>
           <p>
-            <a target="_blank" href="doc/manual.html"><Icon icon={faBook}/> User manual is available.</a>
+            <a target="_blank" href="/sparql/doc/manual.html"><Icon icon={faBook}/> User manual is available.</a>
           </p>
 
           <Accordion>
