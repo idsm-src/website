@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-
 import $ from "jquery";
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
@@ -31,7 +30,6 @@ import "datatables.net";
 import ColumnResizer from "column-resizer";
 
 import { servletBase } from "../config";
-import { builtinPrefixes } from "./config";
 
 import "./TablePlus.scss";
 import "datatables.net-dt/css/jquery.dataTables.css";
@@ -66,6 +64,10 @@ class TablePlus {
   dataTable;
   tableFilterField;
   tableSizeField;
+  tableCompactSwitch;
+  expandedCells = {};
+  tableResizer;
+
   helpReference = "https://triply.cc/docs/yasgui#table";
   label = "Table+";
   priority = 10;
@@ -73,6 +75,7 @@ class TablePlus {
 
   static defaults = {
     openIriInNewWindow: true,
+    ellipseLength: 2048,
     tableConfig: {
       dom: "tip", // tip: Table, Page Information and Pager, change to ipt for showing pagination on top
       pageLength: DEFAULT_PAGE_SIZE, //default page length
@@ -82,6 +85,7 @@ class TablePlus {
       order: [],
       deferRender: true,
       orderClasses: false,
+      autoWidth: false,
       language: {
         paginate: {
           first: "&lt;&lt;", // Have to specify these two due to TS defs, <<
@@ -110,36 +114,19 @@ class TablePlus {
 
 
   getRows() {
-    const rows = [];
-
     if(!this.yasr.results)
-      return [];
+        return [];
 
     const bindings = this.yasr.results.getBindings();
 
     if(!bindings)
-      return rows;
+        return [];
 
+    // Vars decide the columns
     const vars = this.yasr.results.getVariables();
-    const prefixes = this.yasr.getPrefixes();
 
-    for(let rowId = 0; rowId < bindings.length; rowId++) {
-      const binding = bindings[rowId];
-      const row = ["<div>" + (rowId + 1) + "</div>"];
-
-      for(let colId = 0; colId < vars.length; colId++) {
-        const sparqlVar = vars[colId];
-
-        if(sparqlVar in binding)
-          row.push(this.getCellContent(binding, sparqlVar, prefixes));
-        else
-          row.push("");
-      }
-
-      rows.push(row);
-    }
-
-    return rows;
+    // Use "" as the empty value, undefined will throw runtime errors
+    return bindings.map((binding, rowId) => [rowId + 1, ...vars.map((variable) => binding[variable] ?? "")]);
   }
 
 
@@ -151,45 +138,47 @@ class TablePlus {
   getUriLinkFromBinding(binding, prefixes) {
     const href = binding.value;
     let visibleString = href;
+    let size = href.length;
     let prefixed = false;
 
-
     if(prefixes) {
-      for(const prefixLabel in prefixes) {
-        const definition = prefixes[prefixLabel];
+      for(const prefix in prefixes) {
+        const definition = prefixes[prefix];
 
-        if(visibleString.indexOf(definition) === 0) {
+        if(href.indexOf(definition) === 0) {
           const name = href.substring(definition.length);
 
-          if(!name.match(localNameRegExp))
-            continue;
-
-          visibleString = prefixLabel + ":" + name;
-          prefixed = true;
-          break;
+          if((size > name.length || (size === name.length && visibleString.length - size - 1 > prefix.length))
+              && name.match(localNameRegExp)) {
+            visibleString = prefix + ":" + name;
+            size = name.length;
+            prefixed = true;
+          }
         }
       }
     }
 
-    if(!prefixed) {
-      for(const prefixLabel in builtinPrefixes) {
-        const definition = builtinPrefixes[prefixLabel];
+    if(!prefixed && window.info && this.prefixes) {
+      for(const prefix in this.prefixes) {
+        const definition = this.prefixes[prefix];
 
-        if(!prefixes[prefixLabel] && visibleString.indexOf(definition) === 0) {
+        if(!(prefixes && prefixes[prefix]) && href.indexOf(definition) === 0) {
           const name = href.substring(definition.length);
 
-          if(!name.match(localNameRegExp))
-            continue;
-
-          visibleString = prefixLabel + ":" + name;
-          prefixed = true;
-          break;
+          if((size > name.length || (size === name.length && visibleString.length - size - 1 > prefix.length))
+              && name.match(localNameRegExp)) {
+            visibleString = prefix + ":" + name;
+            size = name.length;
+            prefixed = true;
+          }
         }
       }
     }
 
-    let target = `${this.config.openIriInNewWindow ? '_blank ref="noopener noreferrer"' : "_self"}`;
-    let link = `<a class='iri d-inline-block' target='${target}' href='${href}'>${prefixed ? "" : "&lt"}${visibleString}${prefixed ? "" : "&gt;"}</a>`;
+    // Hide brackets when prefixed or compact
+    const hideBrackets = prefixed || this.persistentConfig.compact;
+    const target = `${this.config.openIriInNewWindow ? '_blank ref="noopener noreferrer"' : "_self"}`;
+    const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${href}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
 
     for(const db in patterns) {
       const m = href.match(patterns[db]);
@@ -202,21 +191,34 @@ class TablePlus {
   }
 
 
-  getCellContent(bindings, sparqlVar, prefixes) {
-    const binding = bindings[sparqlVar];
+  getCellContent(binding, prefixes, options) {
     let content;
 
     if(binding.type === "uri")
       content = this.getUriLinkFromBinding(binding, prefixes);
     else
-      content = `<span class='nonIri'>${this.formatLiteral(binding, prefixes)}</span>`;
+      content = `<span class='nonIri'>${this.formatLiteral(binding, prefixes, options)}</span>`;
 
-    return "<div>" + content + "</div>";
+    return `<div>${content}</div>`;
   }
 
 
-  formatLiteral(literalBinding, prefixes) {
-    let stringRepresentation = escape(literalBinding.value);
+  formatLiteral(literalBinding, prefixes, options) {
+    let stringRepresentation = literalBinding.value;
+
+    const shouldEllipse = options?.ellipse ?? true;
+
+    // make sure we don't do an ellipsis for just one character
+    if(shouldEllipse && stringRepresentation.length > this.config.ellipseLength + 1) {
+      const ellipseSize = this.config.ellipseLength / 2;
+      stringRepresentation = `${escape(stringRepresentation.slice(0, ellipseSize))}<a class="tableEllipse" title="Click to expand">…</a>${escape(stringRepresentation.slice(-1 * ellipseSize))}`;
+    } else {
+      stringRepresentation = escape(stringRepresentation);
+    }
+
+    // Return now when in compact mode.
+    if(this.persistentConfig.compact)
+      return stringRepresentation;
 
     if(literalBinding["xml:lang"]) {
       stringRepresentation = `"${stringRepresentation}"<sup>@${literalBinding["xml:lang"]}</sup>`;
@@ -231,12 +233,60 @@ class TablePlus {
 
   getColumns() {
     if(!this.yasr.results)
-      return [];
+        return [];
+
+    const prefixes = this.yasr.getPrefixes();
 
     return [
-      { name: "", searchable: false, width: this.getSizeFirstColumn(), sortable: false }, //prepend with row numbers column
+      {
+        name: "",
+        searchable: false,
+        width: `${this.getSizeFirstColumn()}px`,
+        type: "num",
+        orderable: false,
+        visible: this.persistentConfig.compact !== true,
+        render: (data, type) =>
+          type === "filter" || type === "sort" || !type ? data : `<div class="rowNumber">${data}</div>`,
+      }, //prepend with row numbers column
       ...this.yasr.results?.getVariables().map((name) => {
-        return { name: name, title: name };
+        return {
+          name: name,
+          title: name,
+          render: (data, type, _row, meta) => {
+            // Handle empty rows
+            if(data === "")
+                return data;
+
+            if(type === "filter" || type === "sort" || !type)
+                return data.value;
+
+            // Check if we need to show the ellipsed version
+            if(this.expandedCells[`${meta.row}-${meta.col}`])
+              return this.getCellContent(data, prefixes, { ellipse: false });
+
+            return this.getCellContent(data, prefixes);
+          },
+          createdCell: (cell, cellData, _rowData, row, col) => {
+            // Do nothing on empty cells
+            if(cellData === "")
+                return;
+
+            // Ellipsis is only applied on literals variants
+            if(cellData.type === "literal" || cellData.type === "typed-literal") {
+              const ellipseEl = cell.querySelector(".tableEllipse");
+              if(ellipseEl)
+                ellipseEl.addEventListener("click", () => {
+                  this.expandedCells[`${row}-${col}`] = true;
+                  // Disable the resizer as it messes with the initial drawing
+                  this.tableResizer?.reset({ disable: true });
+                  // Make the table redraw the cell
+                  this.dataTable?.cell(row, col).invalidate();
+                  // Signal the table to redraw the width of the table
+                  this.dataTable?.columns.adjust();
+                });
+            }
+          },
+        };
       }),
     ];
   }
@@ -244,27 +294,29 @@ class TablePlus {
 
   getSizeFirstColumn() {
     const numResults = this.yasr.results?.getBindings()?.length || 0;
-
-    if(numResults > 999)
-      return "30px";
-    else if(numResults > 99)
-      return "20px";
-    else
-      return "10px";
+    return numResults.toString().length * 5;
   }
 
 
   draw(persistentConfig) {
+    this.persistentConfig = { ...this.persistentConfig, ...persistentConfig };
     const table = document.createElement("table");
     const rows = this.getRows();
     const columns = this.getColumns();
+    this.expandedCells = {};
 
-    if(rows.length <= (persistentConfig?.pageSize || DEFAULT_PAGE_SIZE))
+    if(rows.length <= (persistentConfig?.pageSize || DEFAULT_PAGE_SIZE)) {
+      //this.yasr.pluginControls;
       this.yasr.rootEl.classList.add("isSinglePage");
-    else
+    } else {
       this.yasr.rootEl.classList.remove("isSinglePage");
+    }
 
     if(this.dataTable) {
+      // Resizer needs to be disabled otherwise it will mess with the new table's width
+      this.tableResizer?.reset({ disable: true });
+      this.tableResizer = undefined;
+
       this.dataTable.destroy(true);
       this.dataTable = undefined;
     }
@@ -272,14 +324,21 @@ class TablePlus {
     this.yasr.resultsEl.appendChild(table);
 
     // reset some default config properties as they couldn't be initialized beforehand
-    this.config.tableConfig.pageLength = persistentConfig && persistentConfig.pageSize ? persistentConfig.pageSize : DEFAULT_PAGE_SIZE;
-    this.config.tableConfig.data = rows;
-    this.config.tableConfig.columns = columns;
+    const dtConfig = {
+      ...((cloneDeep(this.config.tableConfig))),
+      pageLength: persistentConfig?.pageSize ? persistentConfig.pageSize : DEFAULT_PAGE_SIZE,
+      data: rows,
+      columns: columns,
+    };
 
-    const dtConfig = { ...this.config.tableConfig };
     this.dataTable = $(table).DataTable(dtConfig);
-    // .api();
-    new ColumnResizer(table, { widths: [], partialRefresh: true });
+    this.tableResizer = new ColumnResizer/*.default*/(table, {
+      widths: this.persistentConfig.compact === true ? [] : [this.getSizeFirstColumn()],
+      partialRefresh: true,
+    });
+
+    // Expanding an ellipsis disables the resizing, wait for the signal to re-enable it again
+    this.dataTable.on("column-sizing", () => this.enableResizer());
     this.drawControls();
   }
 
@@ -299,11 +358,40 @@ class TablePlus {
   }
 
 
+  handleSetCompactToggle = (event) => {
+    // Store in persistentConfig
+    this.persistentConfig.compact = event.target.checked;
+    // Update the table
+    this.yasr.storePluginConfig("table", this.persistentConfig);
+    this.draw(this.persistentConfig);
+  };
+
+
+  /**
+   * Draws controls on each update
+   */
   drawControls() {
     // Remove old header
     this.removeControls();
     this.tableControls = document.createElement("div");
     this.tableControls.className = "tableControls";
+
+    // Compact switch
+    const toggleWrapper = document.createElement("div");
+    const switchComponent = document.createElement("label");
+    const textComponent = document.createElement("span");
+    textComponent.innerText = "Compact";
+    textComponent.classList.add("label");
+    switchComponent.appendChild(textComponent);
+    switchComponent.classList.add("switch");
+    toggleWrapper.appendChild(switchComponent);
+    this.tableCompactSwitch = document.createElement("input");
+    switchComponent.addEventListener("change", this.handleSetCompactToggle);
+    this.tableCompactSwitch.type = "checkbox";
+    switchComponent.appendChild(this.tableCompactSwitch);
+    this.tableCompactSwitch.defaultChecked = !!this.persistentConfig.compact;
+    this.tableControls.appendChild(toggleWrapper);
+
     // Create table filter
     this.tableFilterField = document.createElement("input");
     this.tableFilterField.className = "tableFilter";
@@ -366,6 +454,8 @@ class TablePlus {
     this.tableFilterField = undefined;
     this.tableSizeField?.removeEventListener("change", this.handleTableSizeSelect);
     this.tableSizeField = undefined;
+    this.tableCompactSwitch?.removeEventListener("change", this.handleSetCompactToggle);
+    this.tableCompactSwitch = undefined;
 
     // Empty controls
     while(this.tableControls?.firstChild)
@@ -375,11 +465,29 @@ class TablePlus {
   }
 
 
+  enableResizer() {
+    this.tableResizer?.reset({ disable: false });
+  }
+
+
   destroy() {
     this.removeControls();
+    this.tableResizer?.reset({ disable: true });
+    this.tableResizer = undefined;
+    this.dataTable?.off("column-sizing", () => this.enableResizer());
     this.dataTable?.destroy(true);
     this.dataTable = undefined;
     this.yasr.rootEl.classList.remove("isSinglePage");
+  }
+
+
+  initialize() {
+    return new Promise((resolve, _reject) => {
+      if(window.info)
+        window.info.then(data => { this.prefixes = data.prefixes }).finally(() => resolve());
+      else
+        resolve();
+    });
   }
 }
 

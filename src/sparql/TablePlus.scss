@@ -32,10 +32,24 @@ THE SOFTWARE.
     .tableFilter {
       margin-right: 10px;
       height: 100%;
+      padding: 2px 3px;
     }
 
     .tableSizer {
       height: 100%;
+      padding: 2px 3px;
+      min-width: 65px;
+    }
+
+    .switch {
+      display: flex;
+      align-items: center;
+      margin-right: 15px !important;
+      margin-bottom: 0px !important;
+
+      .label {
+        margin-right: 2px;
+      }
     }
   }
 
@@ -47,7 +61,7 @@ THE SOFTWARE.
 
       // Override border-bottom datatables styling
       &.no-footer {
-        border-bottom: 1px solid #d9d9d9;
+        border-bottom: 1px solid #d9d9d9 !important;
       }
 
       thead {
@@ -76,24 +90,33 @@ THE SOFTWARE.
         background-color: #f9f9f9;
       }
 
+      tbody tr:hover {
+        background-color: #f5f9ff !important;
+      }
+
       thead tr th {
         //cannot select text anyway (as headers are buttons as well)
         //By setting it to none explicitly, we won't have issues when resizing columns _and_ selecting text at the meantime
         user-select: none;
-        border-right: 1px dotted gray;
-        font-weight: normal;
+        border-right: 1px dotted #d9d9d9 !important;
+        font-weight: bold;
+        text-align: start;
         overflow: hidden;
         border-bottom: none;
         padding: 8px 10px;
         padding-right: 16px;
 
         &:last-child {
-          border-right: none;
+          border-right: none !important;
+        }
+
+        &:hover {
+          background-color: unset !important;
         }
       }
 
       td {
-        border-top: 1px solid #ddd;
+        border-top: 1px solid #d9d9d9;
         overflow: visible;
 
         & > div {
@@ -101,6 +124,25 @@ THE SOFTWARE.
           padding-left: 7px;
           word-break: break-all;
           hyphens: auto;
+
+          &.rowNumber {
+            word-break: keep-all;
+          }
+        }
+
+        .tableEllipse {
+          cursor: pointer;
+          font-weight: bold;
+          padding: 0 2px;
+          background-color: #428bca33;
+          border-radius: 2px;
+          margin: 0 3px;
+        }
+        .iri {
+          color: #428bca;
+        }
+        .nonIri {
+          white-space: pre;
         }
       }
     }
