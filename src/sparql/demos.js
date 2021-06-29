@@ -1,4 +1,4 @@
-import { serverBase } from "../config";
+import { endpointBase } from "../config";
 import { idn } from "../tag.js"
 
 
@@ -7,7 +7,7 @@ const demoQueries = [{
     queries: [{
         name: "Substructure search",
         description: "Search for structures containing aspirin as their substructure. The query structure is specified by SMILES.",
-        endpoint: serverBase + "/sparql/endpoint/chebi",
+        endpoint: endpointBase + "/sparql/endpoint/chebi",
         query: idn`${0}
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
 
@@ -19,7 +19,7 @@ const demoQueries = [{
       {
         name: "Substructure search by a MOL file",
         description: "Search for all alpha amino acids (in their un-ionized forms). The query structure is specified by MOL.",
-        endpoint: serverBase + "/sparql/endpoint/chebi",
+        endpoint: endpointBase + "/sparql/endpoint/chebi",
         query: idn`${0}
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
 
@@ -50,7 +50,7 @@ const demoQueries = [{
       {
         name: "Similarity search with score values",
         description: "Search for structures similar to ibuprofen. The query structure is specified by SMILES and the cutoff score is set as 0.8.",
-        endpoint: serverBase + "/sparql/endpoint/chebi",
+        endpoint: endpointBase + "/sparql/endpoint/chebi",
         query: idn`${0}
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
           PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -65,7 +65,7 @@ const demoQueries = [{
       {
         name: "Simple similarity search",
         description: "A simpler variant of the previous example; the simpler syntax is especially useful in cases when the exact similarity score is irrelevant.",
-        endpoint: serverBase + "/sparql/endpoint/chebi",
+        endpoint: endpointBase + "/sparql/endpoint/chebi",
         query: idn`${0}
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
           PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
@@ -79,7 +79,7 @@ const demoQueries = [{
       {
         name: "Multiple substructure search",
         description: "Search for compounds that contain any of the specified substructures; in this case, we search for several penicillin-related antibiotics.",
-        endpoint: serverBase + "/sparql/endpoint/chebi",
+        endpoint: endpointBase + "/sparql/endpoint/chebi",
         query: idn`${0}
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
 
@@ -101,11 +101,11 @@ const demoQueries = [{
     queries: [{
         name: "ChEBI interoperability",
         description: "Search for aspirin substructure, also fetching some related compound metadata (labels) from ChEBI.",
-        endpoint: serverBase + "/sparql/endpoint/idsm",
+        endpoint: endpointBase + "/sparql/endpoint/idsm",
         query: idn`${0}
           PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
 
           SELECT * WHERE {
             SERVICE endpoint:chebi {
@@ -118,7 +118,7 @@ const demoQueries = [{
       {
         name: "ChEBI compounds with a specific role of substructures",
         description: "Search for ChEBI compounds containing any substructure anotated as the leprostatic drug (CHEBI:35816).",
-        endpoint: serverBase + "/sparql/endpoint/idsm",
+        endpoint: endpointBase + "/sparql/endpoint/idsm",
         query: idn`${0}
           PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
           PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -126,7 +126,7 @@ const demoQueries = [{
           PREFIX obo: <http://purl.obolibrary.org/obo/>
           PREFIX chebi: <http://purl.obolibrary.org/obo/chebi/>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX sio: <http://semanticscience.org/resource/>
 
           SELECT DISTINCT ?COMPOUND WHERE {
@@ -147,11 +147,11 @@ const demoQueries = [{
       {
         name: "ChEBI Compound properties and roles",
         description: "Display all possible roles of compounds that contain aspirin. The query uses the EBI endpoint for retrieving roles of compounds that contain aspirin, which are in turn retrieved from the IOCB endpoint.",
-        endpoint: serverBase + "/sparql/endpoint/idsm",
+        endpoint: endpointBase + "/sparql/endpoint/idsm",
         query: idn`${0}
           PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
           PREFIX owl: <http://www.w3.org/2002/07/owl#>
           PREFIX obo: <http://purl.obolibrary.org/obo/>
@@ -181,7 +181,7 @@ const demoQueries = [{
           PREFIX chembl: <http://rdf.ebi.ac.uk/terms/chembl#>
           PREFIX uniprot: <http://purl.uniprot.org/core/>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
 
           SELECT ?COMPOUND ?UNIPROT ?ORGANISM_NAME WHERE
           {
@@ -213,7 +213,7 @@ const demoQueries = [{
           PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
           PREFIX chembl: <http://rdf.ebi.ac.uk/terms/chembl#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX nextprot: <http://nextprot.org/rdf#>
 
           SELECT ?COMPOUND ?ENTRY WHERE
@@ -250,7 +250,7 @@ const demoQueries = [{
           PREFIX dc: <http://purl.org/dc/elements/1.1/>
           PREFIX chembl: <http://rdf.ebi.ac.uk/terms/chembl#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX nextprot: <http://nextprot.org/rdf#>
           PREFIX db: <http://nextprot.org/rdf/db/>
 
@@ -288,7 +288,7 @@ const demoQueries = [{
           PREFIX dc: <http://purl.org/dc/elements/1.1/>
           PREFIX chembl: <http://rdf.ebi.ac.uk/terms/chembl#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX nextprot: <http://nextprot.org/rdf#>
           PREFIX db: <http://nextprot.org/rdf/db/>
 
@@ -325,7 +325,7 @@ const demoQueries = [{
         query: idn`${0}
           PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX up:<http://purl.uniprot.org/core/>
           PREFIX rh:<http://rdf.rhea-db.org/>
           PREFIX ch:<http://purl.obolibrary.org/obo/>
@@ -350,7 +350,7 @@ const demoQueries = [{
         query: idn`${0}
           PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX up:<http://purl.uniprot.org/core/>
           PREFIX rh:<http://rdf.rhea-db.org/>
           PREFIX ch:<http://purl.obolibrary.org/obo/>
@@ -388,7 +388,7 @@ const demoQueries = [{
         query: idn`${0}
           PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX up:<http://purl.uniprot.org/core/>
           PREFIX rh:<http://rdf.rhea-db.org/>
           PREFIX ch:<http://purl.obolibrary.org/obo/>
@@ -428,7 +428,7 @@ const demoQueries = [{
         query: idn`${0}
           PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX up:<http://purl.uniprot.org/core/>
           PREFIX rh:<http://rdf.rhea-db.org/>
           PREFIX ch:<http://purl.obolibrary.org/obo/>
@@ -470,7 +470,7 @@ const demoQueries = [{
         query: idn`${0}
           PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
           PREFIX sachem: <http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#>
-          PREFIX endpoint: <${serverBase}/sparql/endpoint/>
+          PREFIX endpoint: <${endpointBase}/sparql/endpoint/>
           PREFIX up:<http://purl.uniprot.org/core/>
           PREFIX rh:<http://rdf.rhea-db.org/>
           PREFIX ch:<http://purl.obolibrary.org/obo/>

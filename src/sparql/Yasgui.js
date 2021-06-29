@@ -3,7 +3,7 @@ import YasguiJS from "@triply/yasgui";
 
 import TablePlus from "./TablePlus";
 import { corsProxy } from "./config";
-import { serverBase } from "../config";
+import { endpointBase } from "../config";
 
 import "@triply/yasgui/build/yasgui.min.css";
 import "./Yasgui.scss";
@@ -53,7 +53,7 @@ class Yasgui extends React.Component {
 }
 
 
-window.info = fetch(serverBase + "/sparql/endpoint/idsm?info", {
+window.info = fetch(endpointBase + "/sparql/endpoint/idsm?info", {
     method: "GET",
     headers: {
       "Accept": "application/json;",

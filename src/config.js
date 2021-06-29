@@ -1,5 +1,6 @@
 const serverBase = "https://idsm.elixir-czech.cz";
-const servletBase = "https://idsm.elixir-czech.cz/chemweb";
+const servletBase = serverBase + "/chemweb";
+const endpointBase = serverBase;
 
 
-export { serverBase, servletBase };
+export { serverBase, servletBase, endpointBase };

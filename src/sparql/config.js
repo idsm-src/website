@@ -1,8 +1,8 @@
-import { serverBase } from "../config";
+import { endpointBase } from "../config";
 import { idn } from "../tag.js"
 
 
-const corsProxy = serverBase + "/sparql/endpoint/proxy";
+const corsProxy = endpointBase + "/sparql/endpoint/proxy";
 
 
 const defaultQuery = idn`${0}
@@ -15,7 +15,7 @@ const defaultQuery = idn`${0}
   LIMIT 1000`
 
 
-const defaultEndpoint = serverBase + "/sparql/endpoint/idsm";
+const defaultEndpoint = endpointBase + "/sparql/endpoint/idsm";
 
 
 const simpleCheckQuery = idn`${0}
@@ -28,7 +28,7 @@ const simpleCheckQuery = idn`${0}
 const checkQuery = idn`${0}
   SELECT ?T WHERE
   {
-    SERVICE <${serverBase}/sparql/endpoint/empty>
+    SERVICE <${endpointBase}/sparql/endpoint/empty>
     {
       VALUES ?T { true }
     }
@@ -52,32 +52,32 @@ const endpoints = [{
   },
   {
     name: "IDSM",
-    endpoint: serverBase + "/sparql/endpoint/idsm",
+    endpoint: endpointBase + "/sparql/endpoint/idsm",
     query: simpleCheckQuery
   },
   {
     name: "IDSM/Sachem: PubChem",
-    endpoint: serverBase + "/sparql/endpoint/pubchem",
+    endpoint: endpointBase + "/sparql/endpoint/pubchem",
     query: simpleCheckQuery
   },
   {
     name: "IDSM/Sachem: ChEMBL",
-    endpoint: serverBase + "/sparql/endpoint/chembl",
+    endpoint: endpointBase + "/sparql/endpoint/chembl",
     query: simpleCheckQuery
   },
   {
     name: "IDSM/Sachem: ChEBI",
-    endpoint: serverBase + "/sparql/endpoint/chebi",
+    endpoint: endpointBase + "/sparql/endpoint/chebi",
     query: simpleCheckQuery
   },
   {
     name: "IDSM/Sachem: DrugBank",
-    endpoint: serverBase + "/sparql/endpoint/drugbank",
+    endpoint: endpointBase + "/sparql/endpoint/drugbank",
     query: simpleCheckQuery
   },
   {
     name: "IDSM/Sachem: Wikidata",
-    endpoint: serverBase + "/sparql/endpoint/wikidata",
+    endpoint: endpointBase + "/sparql/endpoint/wikidata",
     query: simpleCheckQuery
   },
 ];

@@ -1,8 +1,8 @@
-import { serverBase } from "../config.js"
+import { endpointBase } from "../config.js"
 import { idn } from "../tag.js"
 
 
-const endpointBase = serverBase + "/sachem/endpoint";
+const sachemBase = endpointBase + "/sachem/endpoint";
 
 const databaseOpts = [
   { value: "chembl", label: "ChEMBL", link: "https://www.ebi.ac.uk/chembldb/index.php/compound/inspect/CHEMBL",
@@ -89,7 +89,7 @@ function getCompoundStructure(iri) {
     : `SELECT ?MOL { [ rdf:type sio:SIO_011120; sio:has-value ?MOL; sio:is-attribute-of <${compound.iri}> ] }`;
 
   return new Promise((resolve, reject) => {
-    fetch(endpointBase + "/" + compound.db, {
+    fetch(sachemBase + "/" + compound.db, {
       method: "POST",
       headers: {
         "Content-Type" : "application/sparql-query",
@@ -177,7 +177,7 @@ function getQuery(mol, params, offset, limit) {
 
 
 function getEndpoint(params) {
-  return endpointBase + "/" + (params.database.length === 1 ? params.database[0].value : "integrated");
+  return sachemBase + "/" + (params.database.length === 1 ? params.database[0].value : "integrated");
 }
 
 
