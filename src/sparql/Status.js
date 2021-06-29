@@ -21,14 +21,10 @@ class Status extends React.Component {
 
     this.controllers = {};
     this.state = {};
+    this.isLoaded = false;
 
     for(const endpoint of this.props.endpoints)
       this.state[endpoint.name] = states.CHECKING;
-  }
-
-
-  componentDidMount() {
-    this.reload();
   }
 
 
@@ -106,6 +102,11 @@ class Status extends React.Component {
 
 
   render() {
+    if(this.props.isShown && !this.isLoaded) {
+      this.isLoaded = true;
+      this.reload();
+    }
+
     return (
       <>
         <ul>

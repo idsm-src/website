@@ -21,6 +21,8 @@ function Sparql() {
     trackPageView();
   }, []);
 
+  const [statusIsOpen, setStatusIsOpen] = React.useState(false);
+
   const yasgui = React.useRef(null);
 
   return (
@@ -51,7 +53,7 @@ function Sparql() {
             </Card>
           </Accordion>
 
-          <Accordion>
+          <Accordion onSelect={e => setStatusIsOpen(e != null)}>
             <Card>
               <Card.Header>
                 <Accordion.Toggle as={Button} variant="outline-success" block eventKey={'0'}>
@@ -60,7 +62,7 @@ function Sparql() {
               </Card.Header>
               <Accordion.Collapse eventKey={'0'}>
                 <Card.Body className="mt-2">
-                  <Status endpoints={endpoints}/>
+                  <Status endpoints={endpoints} isShown={statusIsOpen}/>
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
