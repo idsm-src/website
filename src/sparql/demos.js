@@ -170,7 +170,7 @@ const demoQueries = [{
       }]
   },
   {
-    name: "Interoperability examples with UniProt&neXtProt",
+    name: "Interoperability examples with neXtProt & UniProt",
     description: "Due to availability of official ChEMBL RDF service, these examples currently use a custom mirror of ChEMBL.",
     queries: [{
         name: "UniProt interoperability",
@@ -317,7 +317,7 @@ const demoQueries = [{
           }`
       }]
   },{
-    name: "Interoperability examples with Rhea",
+    name: "Interoperability examples with Rhea & UniProt",
     queries: [{
         name: "Rhea interoperability",
         description: "Retrieve the Rhea biochemical reactions that involve cholesterol or cholesterol derivatives",
@@ -505,6 +505,61 @@ const demoQueries = [{
           }
           GROUP BY ?DISEASE ?DISEASE_NAME
           ORDER BY DESC(count(distinct ?PROTEIN))`
+      },
+      {
+        name: "Rhea+UniProt: Interacting drugs",
+        description: "Retrieve ChEMBL drugs that interact with UniProt enzymes catalyzing Rhea reactions involving members of the ChEBI class ChEBI:15889 (sterol) as participants.",
+        endpoint: endpointBase + "/sparql/endpoint/idsm",
+        query: idn`${0}
+          PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+          PREFIX owl: <http://www.w3.org/2002/07/owl#>
+          PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+          PREFIX up: <http://purl.uniprot.org/core/>
+          PREFIX rh: <http://rdf.rhea-db.org/>
+          PREFIX CHEBI: <http://purl.obolibrary.org/obo/CHEBI_>
+          PREFIX chebihash: <http://purl.obolibrary.org/obo/chebi#>
+          PREFIX taxon:<http://purl.uniprot.org/taxonomy/>
+          PREFIX cco: <http://rdf.ebi.ac.uk/terms/chembl#>
+          prefix skos: <http://www.w3.org/2004/02/skos/core#>
+
+          SELECT DISTINCT ?protein ?proteinFullName ?activityType
+              ?standardActivityValue ?standardActivityUnit ?chemblMolecule ?chemlbMoleculePrefLabel WHERE {
+            SERVICE <https://sparql.uniprot.org> {
+              SERVICE <https://sparql.rhea-db.org/sparql> {
+                # retrieve members of the ChEBI class ChEBI:15889 (sterol)
+                {
+                  ?chebi (rdfs:subClassOf)+ CHEBI:15889.
+                } UNION {
+                  _:bn (rdfs:subClassOf)+ CHEBI:15889.
+                  _:bn rdfs:subClassOf [
+                      a owl:Restriction;
+                      owl:onProperty chebihash:has_major_microspecies_at_pH_7_3;
+                      owl:someValuesFrom ?chebi ].
+                }
+
+                # retrieve the Rhea reactions involving these ChEBI as participants
+                ?reaction rdfs:subClassOf rh:Reaction;
+                    rh:status rh:Approved;
+                    rh:side / rh:contains / rh:compound / rh:chebi ?chebi.
+              }
+
+              # retrieve the human (taxid:9606) enzymes catalyzing these Rhea reactions
+              ?protein up:annotation / up:catalyticActivity / up:catalyzedReaction ?reaction;
+                  up:organism taxon:9606;
+                  up:recommendedName / up:fullName ?proteinFullName.
+            }
+
+            # retrieve the drugs in clinical phase 4 that interact with the enzymes
+            ?activity a cco:Activity;
+                cco:hasAssay / cco:hasTarget / cco:hasTargetComponent/cco:targetCmptXref ?protein;
+                cco:hasMolecule ?chemblMolecule;
+                cco:standardType ?activityType;
+                cco:standardValue ?standardActivityValue;
+                cco:standardUnits ?standardActivityUnit.
+
+            ?chemblMolecule cco:highestDevelopmentPhase "4"^^xsd:int;
+                skos:prefLabel ?chemlbMoleculePrefLabel.
+          }`
       }]
 }];
 
