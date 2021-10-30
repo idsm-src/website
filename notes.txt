@@ -1,0 +1,4 @@
+cd node_modules/ketcher-react/dist
+sed -i "s|'body'|'#ketcher'|g" index.js index.modern.js
+sed -i 's|smallEditor|small|g' index.css
+cp index.css ../../../src/sachem/ketcher.scss

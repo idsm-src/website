@@ -106,7 +106,7 @@ function Search(props) {
       </Row>
 
       <Row className="mt-3">
-        <Col md={12} lg={7} xl={8}>
+        <Col md={12} lg={7} xl={8} style={{ position: "inherit" }}>
           <div id="ketcher" style={{ height:"600px" }}>
             <Editor structServiceProvider={new StandaloneStructServiceProvider()}/>
           </div>
