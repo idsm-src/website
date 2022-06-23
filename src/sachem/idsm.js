@@ -215,7 +215,7 @@ function search(mol, params, offset, limit) {
             if(!m)
               return msg;
 
-            const db = databaseOpts.find(e => e.value = m[2])
+            const db = databaseOpts.find(e => e.value === m[2])
             return `iteration limit exceeded for ${db ? db.label :  m[2]}:${m[1]}`;
           });
 
