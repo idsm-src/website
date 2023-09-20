@@ -20,6 +20,9 @@ class Yasgui extends React.Component {
 
 
   componentDidMount() {
+    if(this.yasgui)
+      return;
+      
     this.yasgui = new YasguiJS(this.reference.current, {
       endpointCatalogueOptions: {
         getData: () => this.props.endpoints

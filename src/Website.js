@@ -1,7 +1,7 @@
 import React from "react";
 import { Suspense } from "react";
-import { Navbar, Nav, NavLink, NavbarBrand, Container, Row, Col, Modal, Image, Button, Spinner } from "react-bootstrap";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { Navbar, Nav, NavbarBrand, Container, Row, Col, Modal, Image, Button, Spinner } from "react-bootstrap";
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap"
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAtom, faNetworkWired, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
@@ -111,6 +111,30 @@ function Contacts() {
 }
 
 
+function Chemweb() {
+  const { search } = useLocation();
+
+  const style = {
+    position: "fixed",
+    top: "60px",
+    left: 0,
+    bottom: 0,
+    right: 0,
+    width: "100%",
+    height: "calc(100% - 60px)",
+    border: "none",
+    margin: 0,
+    padding: 0,
+    overflow: "hidden",
+    zIndex: 1
+  };
+  
+  return (
+    <iframe src={"/chemweb/Chemweb.html"+search} title="chemweb" style={style}/>
+  );
+}
+
+
 function Website() {
   React.useEffect(() => {
     initMatomo();
@@ -118,19 +142,19 @@ function Website() {
 
   return (
     <BrowserRouter>
-      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark px-3" style={{zIndex:2}}>
         <LinkContainer to="/"><NavbarBrand><img src={idsmLogo} height="32px" alt="IDSM"/></NavbarBrand></LinkContainer>
         <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav activeKey={window.location.pathname} className="mr-auto">
-            <LinkContainer to="/sachem"><NavLink><Icon icon={faAtom}/> Sachem GUI</NavLink></LinkContainer>
-            <LinkContainer to="/sparql"><NavLink><Icon icon={faNetworkWired}/> SPARQL GUI</NavLink></LinkContainer>
-            <NavLink href="/chemweb"><Icon icon={faDatabase}/> ChemWebRDF</NavLink>
+            <Nav.Link to="/sachem" as={NavLink}><Icon icon={faAtom}/> Sachem GUI</Nav.Link>
+            <Nav.Link to="/sparql" as={NavLink}><Icon icon={faNetworkWired}/> SPARQL GUI</Nav.Link>
+            <Nav.Link to="/chemweb" as={NavLink}><Icon icon={faDatabase}/> ChemWebRDF</Nav.Link>
           </Nav>
-          <Nav>
-            <NavLink target="_blank" rel="noreferrer" href="https://bioinformatics.group.uochb.cz/en">
+          <Nav className="ms-auto">
+            <Nav.Link target="_blank" rel="noreferrer" href="https://bioinformatics.group.uochb.cz/en">
               <Icon icon={faHome}/> Bioinformatics @ IOCB Prague
-            </NavLink>
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -138,11 +162,12 @@ function Website() {
       <div className="page">
         <ErrorBoundary>
           <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
-            <Switch>
-              <Route path="/sachem" component={Sachem}/>
-              <Route path="/sparql" component={Sparql}/>
-              <Route path="/" component={Home}/>
-            </Switch>
+            <Routes>
+              <Route path="/sachem/*" element={<Sachem/>}/>
+              <Route path="/sparql/" element={<Sparql/>}/>
+              <Route path="/chemweb/" element={<Chemweb/>}/>
+              <Route path="/" element={<Home/>}/>
+            </Routes>
           </Suspense>
         </ErrorBoundary>
       </div>
@@ -150,7 +175,7 @@ function Website() {
       <Container fluid className="pt-1 mt-5 footer">
         <Row className="justify-content-center align-items-center">
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
-            <span>&copy; 2018&ndash;2021 <a target="_blank" rel="noreferrer" href="https://www.uochb.cz/en">IOCB Prague</a></span>
+            <span>&copy; 2018&ndash;2023 <a target="_blank" rel="noreferrer" href="https://www.uochb.cz/en">IOCB Prague</a></span>
           </Col>
           <Col lg="auto" md="auto" xs={12} className="mb-0 p-0"/>
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">

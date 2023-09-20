@@ -1,46 +1,37 @@
 .sachem-search {
-  max-width: 1350px !important;
+  div.Ketcher-root {
+    min-width: unset !important;
+    max-height: 600px;
 
-  #ketcher {
-    @import "./ketcher.scss";
+    // top toolbar
+    div.css-1jw7nj {
+      height: 40px;
+      gap: 0px;
 
-    .TopToolbar-module_recognize__mEhId {
+      // toolbar button
+      button.css-iw95iu {
+        height: 32px;
+        width: 32px;
+        padding: 4px;
+      }
+    }
+  }
+
+  // input range
+  .input-range {
+    .input-range__label--min, .input-range__label--max {
       display: none;
     }
 
-    .ActionButton-module_button__1aDHe[title="Help (?)"] {
-        display: none;
+    .input-range__label {
+      color: rgb(33, 37, 41);
+      font-family: inherit !important;
     }
-    
-    .LeftToolbar-module_root__1pZPV :nth-child(6) {
-        display: none;
+
+    .input-range__label--value {
+      top: -2.1rem !important;
+      font-size: 95% !important;
     }
-    
-    .LeftToolbar-module_root__1pZPV :nth-child(8) {
-        display: none;
-    }
-    
-    .LeftToolbar-module_root__1pZPV :nth-child(9) {
-        display: none;
-    }
-  }
-
-  .without-height {
-    height: auto !important;
-  }
-
-  .input-range__label--min, .input-range__label--max {
-     display: none;
-  }
-
-  .input-range__label {
-    color: rgb(33, 37, 41);
-    font-family: inherit !important;
-    font-size: inherit !important;
-  }
-
-  .input-range__label--value {
-    top: -2.1rem !important;
   }
 }
 
@@ -85,6 +76,7 @@
     margin-left: 1em;
   }
 }
+
 
 .compound-tooltip {
   max-width: 450px !important;

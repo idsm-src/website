@@ -1,4 +1,4 @@
-import { endpointBase } from "../config.js"
+import { endpointBase, servletBase } from "../config.js"
 import { idn } from "../tag.js"
 
 
@@ -72,7 +72,7 @@ function getCompoundFromIri(iri) {
         label: db.label + ":\u200B" + match[1],
         link: db.link + match[1],
         img : function(size) {
-          return "https://idsm.elixir-czech.cz/chemweb/" + db.value + "/compound/image?id=" + match[1] + "&w=" + size;
+          return servletBase + "/" + db.value + "/compound/image?id=" + match[1] + "&w=" + size;
         }
       };
   }

@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter as Router, Switch, Route, Redirect, useParams } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 
 import Search from "./Search.js";
 import Results from "./Results.js";
@@ -16,19 +16,11 @@ function Sachem() {
   }, []);
 
   return (
-    <Router>
-      <Switch>
-        <Route path="/search/:hash?">
-          <SearchPage/>
-        </Route>
-        <Route path="/results/:hash">
-          <ResultsPage/>
-        </Route>
-        <Route path="/">
-          <Redirect to="/search"/>
-        </Route>
-      </Switch>
-    </Router>
+    <Routes>
+      <Route path="/search/:hash?" element={<SearchPage />} />
+      <Route path="/results/:hash" element={<ResultsPage />} />
+      <Route path="/" element={<SearchPage />} />
+    </Routes>
   );
 }
 
@@ -44,7 +36,7 @@ function ResultsPage() {
   var { mol, params } = parseHash(useParams()["hash"]);
 
   if(mol == null)
-    return <Redirect to="/search"/>;
+    return <Navigate to="/search"/>;
 
   return <Results query={mol} params={params}/>;
 }

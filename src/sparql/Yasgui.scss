@@ -1,12 +1,10 @@
-.yasgui {
+#root .yasgui {
   line-height: initial;
-
-  * {
-    box-sizing: content-box;
-  }
 
   input[type="checkbox"] {
     margin: revert;
+    opacity: revert;
+    position: revert;
   }
 
   svg {
@@ -16,13 +14,6 @@
   label {
     margin-bottom: revert;
   }
-
-  button {
-    font-family: revert;
-    font-size: revert;
-    box-sizing: revert;
-  }
-
 
   select {
     -webkit-appearance: none;
@@ -45,9 +36,15 @@
     outline-width: 1px !important;
   }
 
-
-  .autocomplete {
-    border: 1px solid #ccc !important;
+  .controlbar {
+    button {
+      padding: 0px 0px 0px 10px;
+    }
+  
+    .autocomplete {
+      border: 1px solid #ccc !important;
+      padding: 3px 6px;
+    }
   }
 
   .dataTables_wrapper {

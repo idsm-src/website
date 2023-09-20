@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Alert, Button, ButtonGroup, Card, Container, Row, Col, OverlayTrigger, Popover, Spinner, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleLeft, faAngleUp, faAngleDown, faImage, faEdit, faTable, faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ import { search, getQuery, getEndpoint, getDownloadLink, getCompoundStructure } 
 
 
 function Compound(props) {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = React.useState(false);
 
@@ -18,7 +18,7 @@ function Compound(props) {
 
     getCompoundStructure(props.iri)
     .then(mol => {
-      history.push("/search/" + makeHash(mol, props.params));
+      navigate("../search/" + makeHash(mol, props.params));
     })
     .catch(err => {
       console.log("mol retrieval error: " + err);
@@ -30,14 +30,14 @@ function Compound(props) {
 
   return (
     <Card className="compound-card">
-      <div className="text-right">
+      <div className="ms-auto">
         <OverlayTrigger overlay={<Tooltip>View larger image</Tooltip>}>
-          <a href={props.img(1000)} target="_blank" rel="noopener noreferrer" className="mr-2 badge badge-light">
+          <a href={props.img(1000)} target="_blank" rel="noopener noreferrer" className="mr-2 badge text-dark">
             <Icon icon={faImage}/>
           </a>
         </OverlayTrigger>
         <OverlayTrigger overlay={<Tooltip>Search for this structure</Tooltip>}>
-          <span onClick={editMol} className="badge badge-light c-pointer">
+          <span onClick={editMol} className="badge text-dark c-pointer">
             {loading
               ? <Spinner animation="border" variant="secondary" className="spinner"/>
               : <Icon icon={faEdit}/>
@@ -72,7 +72,7 @@ function Compound(props) {
 
 function Results(props) {
   const queryLimit = 6 * 16;
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [errorMsg, setErrorMsg] = React.useState(null);
   const [results, setResults] = React.useState([]);
@@ -122,23 +122,22 @@ function Results(props) {
         <Col>
           <h1 className="display-4 text-nowrap">Search results</h1>
         </Col>
-        <Col sm="auto" ml="auto">
-          <Button variant="outline-primary" onClick={() => history.push("/search/" + makeHash(props.query, props.params))}>
-            <Icon icon={faAngleDoubleLeft}/> Edit this search
-          </Button>
-
-          {warnings.length > 0 && !showWarnings &&
-            <Button variant="outline-danger" className="ml-3" onClick={() => setShowWarnings(true)}>
-              <Icon icon={faExclamationTriangle}/> Show warnings
-            </Button>
-          }
-
+        <Col sm="auto" ml="auto" className="pt-4">
           <ButtonGroup className="ml-3">
-            <a href={getDownloadLink(props.query, props.params)}>
-              <Button variant="outline-secondary">
-                <Icon icon={faTable}/> Get CSV
+            <Button variant="outline-secondary" onClick={() => navigate("../search/" + makeHash(props.query, props.params))}>
+              <Icon icon={faAngleDoubleLeft}/> Edit this search
+            </Button>
+            
+            {warnings.length > 0 && !showWarnings &&
+              <Button variant="outline-danger" className="ml-3" onClick={() => setShowWarnings(true)}>
+                <Icon icon={faExclamationTriangle}/> Show warnings
               </Button>
-            </a>
+            }
+            
+            <Button variant="outline-secondary" href={getDownloadLink(props.query, props.params)}>
+              <Icon icon={faTable}/> Get CSV
+            </Button>
+            
             <Button variant="outline-secondary" onClick={() => setShowSPARQL(!showSPARQL)}>
               SPARQL <Icon icon={showSPARQL ? faAngleUp : faAngleDown}/>
             </Button>
@@ -191,7 +190,7 @@ function Results(props) {
 
       {loading &&
         <div className="mt-4 text-center">
-          <Spinner animation="border" variant="primary" className="spinner d-block ml-auto mr-auto"/>
+          <Spinner animation="border" variant="primary" className="spinner d-block mx-auto"/>
           <p className="mt-3">Searching...</p>
         </div>
       }
