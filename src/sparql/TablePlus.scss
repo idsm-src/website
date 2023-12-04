@@ -146,6 +146,13 @@ THE SOFTWARE.
         .nonIri {
           white-space: pre-wrap;
         }
+        
+        iframe {
+          border: none;
+          pointer-events: none;
+          vertical-align: middle;
+          margin-right: 15px;
+        }
       }
     }
 

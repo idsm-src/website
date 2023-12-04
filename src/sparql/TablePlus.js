@@ -47,13 +47,59 @@ const PN_LOCAL = `((${PN_CHARS_U}|[0-9:]|${PLX})((${PN_CHARS}|[.:]|${PLX})*(${PN
 var localNameRegExp = new RegExp(`^${PN_LOCAL}$`,"u");
 
 
-const patterns = {
-  drugbank: /^http:\/\/wifo5-04\.informatik\.uni-mannheim\.de\/drugbank\/resource\/drugs\/DB([0-9]+)$/,
-  chebi: /^http:\/\/purl\.obolibrary\.org\/obo\/CHEBI_([0-9]+)$/,
-  chembl: /^http:\/\/rdf\.ebi\.ac\.uk\/resource\/chembl\/molecule\/CHEMBL([0-9]+)$/,
-  pubchem: /^http:\/\/rdf\.ncbi\.nlm\.nih\.gov\/pubchem\/compound\/CID([0-9]+)$/,
-  wikidata: /^http:\/\/www\.wikidata\.org\/entity\/Q([0-9]+)$/,
-}
+const compounds = [
+  {
+    db: "drugbank",
+    pattern: /^http:\/\/wifo5-04\.informatik\.uni-mannheim\.de\/drugbank\/resource\/drugs\/DB([0-9]+)$/,
+    link: "https://go.drugbank.com/drugs/DB"
+  },{
+    db: "chebi",
+    pattern: /^http:\/\/purl\.obolibrary\.org\/obo\/CHEBI_([0-9]+)$/,
+    link: "https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:"
+  },{
+    db: "chembl",
+    pattern: /^http:\/\/rdf\.ebi\.ac\.uk\/resource\/chembl\/molecule\/CHEMBL([0-9]+)$/,
+    link: "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL"
+  },{
+    db: "pubchem",
+    pattern: /^http:\/\/rdf\.ncbi\.nlm\.nih\.gov\/pubchem\/compound\/CID([0-9]+)$/,
+    link: "https://pubchem.ncbi.nlm.nih.gov/compound/"
+  },{
+    db: "wikidata",
+    pattern: /^http:\/\/www\.wikidata\.org\/entity\/Q([0-9]+)$/,
+    link: "http://www.wikidata.org/entity/Q"
+  },{
+    db: "mona",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/CMPD_(.*)$/,
+    link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
+  }
+]
+
+
+const spectrum = [
+  {
+    db: "mona",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/MS_(.*)$/,
+    link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
+  },{
+    db: "isdb",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/MS_(.*)$/,
+    link: "https://zenodo.org/records/8287341?id="
+  }
+]
+
+
+const experiments =  [
+  {
+    db: "mona",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/(.*)$/,
+    link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
+  },{
+    db: "isdb",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/(.*)$/,
+    link: "https://zenodo.org/records/8287341?id="
+  }
+]
 
 
 class TablePlus {
@@ -135,6 +181,11 @@ class TablePlus {
   }
 
 
+  getMSUri(db, id) {
+    return `${servletBase}/ms.html#n/${db}/${id}`;
+  }
+
+
   getUriLinkFromBinding(binding, prefixes) {
     const href = binding.value;
     let visibleString = href;
@@ -178,15 +229,38 @@ class TablePlus {
     // Hide brackets when prefixed or compact
     const hideBrackets = prefixed || this.persistentConfig.compact;
     const target = `${this.config.openIriInNewWindow ? '_blank ref="noopener noreferrer"' : "_self"}`;
-    const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${href}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
 
-    for(const db in patterns) {
-      const m = href.match(patterns[db]);
+    for(const i in compounds) {
+      const e = compounds[i];
+      const m = href.match(e.pattern);
 
-      if(m)
-        return `<a target='${target}' href='${this.getImgUri(db, m[1], 1000)}' class='d-inline-block'><img class='zoomable' src='${this.getImgUri(db, m[1], 400)}' loading='lazy' onerror='this.style.display="none"'></a>${link}`;
+      if(m) {
+        const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${e.link}${m[1]}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
+        return `<a target='${target}' href='${this.getImgUri(e.db, m[1], 1000)}' class='d-inline-block'><img class='zoomable' src='${this.getImgUri(e.db, m[1], 400)}' loading='lazy' onerror='this.style.display="none"'></a>${link}`;
+      }
     }
 
+    for(const i in spectrum) {
+      const e = spectrum[i];
+      const m = href.match(e.pattern);
+
+      if(m) {
+        const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${e.link}${m[1]}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
+        return `<iframe src='${this.getMSUri(e.db, m[1])}' title='MS Chart' loading='lazy' width='100' height='60' scrolling='no' style='border: none; pointer-events: none;'></iframe>${link}`;
+      }
+    }
+
+    for(const i in experiments) {
+      const e = experiments[i];
+      const m = href.match(e.pattern);
+
+      if(m) {
+        const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${e.link}${m[1]}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
+        return `<a target='${target}' href='${this.getImgUri(e.db, m[1], 1000)}' class='d-inline-block'><img class='zoomable' src='${this.getImgUri(e.db, m[1], 400)}' loading='lazy' onerror='this.style.display="none"'></a><iframe src='${this.getMSUri(e.db, m[1])}' title='MS Chart' loading='lazy' width='100' height='60' scrolling='no' style='border: none; pointer-events: none;'></iframe>${link}`;
+      }
+    }
+
+    const link = `<span class="iri">${hideBrackets ? "" : "&lt;"}<a class='iri' target='${target}' href='${href}'>${visibleString}</a>${hideBrackets ? "" : "&gt;"}</span>`;
     return link;
   }
 

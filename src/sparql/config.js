@@ -80,6 +80,11 @@ const endpoints = [{
     endpoint: endpointBase + "/sparql/endpoint/wikidata",
     query: simpleCheckQuery
   },
+  {
+    name: "IDSM/Sachem: MoNA",
+    endpoint: endpointBase + "/sparql/endpoint/mona",
+    query: simpleCheckQuery
+  },
 ];
 
 

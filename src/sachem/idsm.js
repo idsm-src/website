@@ -15,6 +15,8 @@ const databaseOpts = [
     pattern: /^http:\/\/wifo5-04\.informatik\.uni-mannheim\.de\/drugbank\/resource\/drugs\/DB([0-9]+)$/ },
   { value: "wikidata", label: "Wikidata", link: "http://www.wikidata.org/entity/Q",
     pattern: /^http:\/\/www\.wikidata\.org\/entity\/Q([0-9]+)$/ },
+  { value: "mona", label: "MoNA", link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/",
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/CMPD_(.*)$/ },
   { value: "molmedb", label: "MolMeDB", link: "https://molmedb.upol.cz/mol/MM",
     pattern: /^https:\/\/molmedb\.upol\.cz\/mol\/MM([0-9]+)$/ },
 ];
