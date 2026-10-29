@@ -11,6 +11,7 @@ import { initMatomo } from "./matomo.js"
 
 import idsmLogo from "./logo-idsm.svg";
 import elixirLogo from "./logo-elixir.png";
+import tacrLogo from "./logo-tacr.png";
 import uochbLogo from "./logo-uochb.png";
 
 import "./Website.scss";
@@ -175,7 +176,7 @@ function Website() {
       <Container fluid className="pt-1 mt-5 footer">
         <Row className="justify-content-center align-items-center">
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
-            <span>&copy; 2018&ndash;2023 <a target="_blank" rel="noreferrer" href="https://www.uochb.cz/en">IOCB Prague</a></span>
+            <span>&copy; 2018&ndash;2026 <a target="_blank" rel="noreferrer" href="https://www.uochb.cz/en">IOCB Prague</a></span>
           </Col>
           <Col lg="auto" md="auto" xs={12} className="mb-0 p-0"/>
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
@@ -187,6 +188,9 @@ function Website() {
           <Col lg="auto" md={12} xs={12} className="mb-0 p-0"/>
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
             <a target="_blank" rel="noreferrer" href="https://www.uochb.cz/en" className="d-block p-1"><Image src={uochbLogo} height={40}/></a>
+          </Col>
+          <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
+            <a target="_blank" rel="noreferrer" href="https://tacr.gov.cz/" className="d-block p-1"><Image src={tacrLogo} height={30}/></a>
           </Col>
           <Col lg="auto" md="auto" xs="auto" className="mb-1 px-4">
             <a target="_blank" rel="noreferrer" href="https://www.elixir-czech.cz/" className="d-block p-1"><Image src={elixirLogo} height={40}/></a>

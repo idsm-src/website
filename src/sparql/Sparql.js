@@ -46,9 +46,27 @@ function Sparql() {
           <p>
             This page allows you to access the IDSM functionality through a SPARQL web-interface (on the right), and connect the search results to the data from other services. For a quick start, you may select a query example from the list below.
           </p>
-          <p>
-            <a target="_blank" href="/sparql/doc/manual.html"><Icon icon={faBook}/> User manual is available.</a>
-          </p>
+          <Accordion>
+            <Card>
+              <Card.Header>
+                <CustomToggle variant="outline-success" block eventKey="0">
+                  <Icon icon={faBook}/> Manuals
+                </CustomToggle>
+              </Card.Header>
+              <Accordion.Collapse eventKey="0">
+                <Card.Body className="mt-2">
+
+                <ul>
+                  <li><a target="_blank" rel="noreferrer" href="/sparql/doc/manual.html">SPARQL GUI and sachem manual</a></li>
+                  <li><a target="_blank" rel="noreferrer" href="/docs/access">SPARQL Endpoint Access manual</a></li>
+                  <li><a target="_blank" rel="noreferrer" href="/docs/ms">MS extension manual</a></li>
+                  <li><a target="_blank" rel="noreferrer" href="https://pubchem.ncbi.nlm.nih.gov/docs/rdf">PubChemRDF description</a></li>
+                </ul>
+                  
+                </Card.Body>
+              </Accordion.Collapse>
+            </Card>
+          </Accordion>
 
           <Accordion>
             <Card>

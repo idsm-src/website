@@ -70,7 +70,7 @@ const compounds = [
     link: "http://www.wikidata.org/entity/Q"
   },{
     db: "mona",
-    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/CMPD_(.*)$/,
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/(.*)_CMPD$/,
     link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
   }
 ]
@@ -79,11 +79,11 @@ const compounds = [
 const spectrum = [
   {
     db: "mona",
-    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/MS_(.*)$/,
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/(.*)_MS$/,
     link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
   },{
     db: "isdb",
-    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/MS_(.*)$/,
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/(.*)_MS$/,
     link: "https://zenodo.org/records/8287341?id="
   }
 ]
@@ -92,11 +92,11 @@ const spectrum = [
 const experiments =  [
   {
     db: "mona",
-    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/(.*)$/,
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/mona\/(.*)_EXP$/,
     link: "https://mona.fiehnlab.ucdavis.edu/spectra/display/"
   },{
     db: "isdb",
-    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/(.*)$/,
+    pattern: /^https:\/\/idsm\.elixir-czech\.cz\/rdf\/isdb\/(.*)_EXP$/,
     link: "https://zenodo.org/records/8287341?id="
   }
 ]

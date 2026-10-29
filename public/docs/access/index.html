@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SPARQL Endpoint Access</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  <style>
+    body { text-align: justify; }
+    h1, h2, h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    table.table { margin-top: 1.5rem !important; margin-bottom: 2.5rem !important; }
+    img { margin-top: 1.5rem; margin-bottom: 2.5rem; }
+    pre { margin-top: 1.0rem; margin-bottom: 0.5rem; border: 1px solid #ddd; padding: 0.5rem;}
+
+    table.table td { padding: .1rem 1.5rem .1rem .5rem; vertical-align: middle; border-right-width: 1px; }
+    table.table td:last-child {  padding: .1rem .5rem .1rem .5rem; border-right-width: 0px; }
+    table.table th {  padding: .25rem .5rem .25rem .5rem; border-right-width: 1px; }
+    table.table th:last-child { padding: .25rem 1.5rem .25rem .5rem; border-right-width: 0px; }
+
+    .highlight .kw  { color: #7F0055; font-weight: bold; }
+    .highlight .string  { color: #116644; }
+    /*.highlight .class, .type { color: #860e0e; }*/
+    .highlight .var { color: #0000C0; }
+
+    .nav-link { padding: 0.2rem 0.5rem !important; margin: 0.1rem 0rem !important;  border-left: solid 2px rgba(0, 0, 0, 0);}
+
+    .nav-link.active { background-color: #eaf3f8; border-left: solid 2px #0d6efd; }
+
+    code { color: #0000C0; }
+  </style>
+</head>
+
+<body style="position: relative" data-bs-spy="scroll" data-bs-target="#navbar-example3">
+<div class="container-fluid" style="max-width: 1200px; margin:auto">
+<div class="row flex-nowrap">
+
+<div class="col-auto d-none d-md-block col-md-3 col-xl-3 px-0 bg-light">
+<div class="d-flex flex-column align-items-start min-vh-100 sticky-top">
+  <nav id="navbar-example3" class="w-100 navbar navbar-light bg-light px-2">
+    <ul class="w-100 nav flex-column mb-auto align-items-start" id="menu">
+      <li class="w-100 nav-item">
+        <a href="#querying" class="nav-link align-middle px-0 fw-bold">Querying IDSM</a>
+        <ul class="collapse show nav flex-column ms-1" id="submenu1">
+          <li class="w-100"><a href="#python" class="nav-link px-0">Querying from Python</a></li>
+          <li class="w-100"><a href="#java" class="nav-link px-0">Querying from Java</a></li>
+          <li class="w-100"><a href="#shell" class="nav-link px-0">Querying from shell</a></li>
+        </ul>
+      </li>
+      <li class="w-100 nav-item">
+        <a href="#local" class="w-100 nav-link px-0 align-middle fw-bold">Local Access</a>
+      </li>
+    </ul>
+  </nav>
+</div>
+</div>
+
+
+<div class="col py-3">
+
+<h1 class="display-3 mt-3 fw-bold">SPARQL Endpoint Access</h1>
+
+
+<h2 id="querying">Querying IDSM SPARQL endpoint</h2>
+<p>
+IDSM supports querying through the <a target="_blank" href="https://www.w3.org/TR/sparql11-protocol/">SPARQL Protocol</a>. This allows IDSM to be accessed in a standard way from different programming languages, just by using a library/package/command that implements this protocol. The following sections demonstrate how to access IDSM from several common languages.
+</p>
+
+
+<h3 id="python">Querying a SPARQL endpoint from Python</h3>
+<p>
+To access IDSM from Python, the <a target="_blank" href="https://sparqlwrapper.readthedocs.io/en/latest/">SPARQLWrapper</a> module can be used. SPARQLWrapper is a simple Python wrapper around a SPARQL service to remotely execute your queries. It helps by creating the query invocation and, optionally, converting the result into a more manageable format.
+</p>
+<div class="highlight">
+<pre><span class="kw">from</span> <span class="class">SPARQLWrapper</span> <span class="kw">import</span> <span class="class">SPARQLWrapper</span>, <span class="var">JSON</span>
+
+<span class="var">endpoint</span> = <span class="string">&quot;https://idsm.elixir-czech.cz/sparql/endpoint/idsm&quot;</span>
+<span class="var">query</span> = <span class="string">&quot;&quot;&quot;
+    PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+
+    SELECT * WHERE {
+        ?entity rdfs:label ?label
+    }
+    LIMIT 10
+    &quot;&quot;&quot;</span>
+
+<span class="var">sparql</span> = <span class="class">SPARQLWrapper</span>(<span class="var">endpoint</span>)
+<span class="var">sparql</span>.setQuery(<span class="var">query</span>)
+<span class="var">sparql</span>.setReturnFormat(<span class="var">JSON</span>)
+
+<span class="var">results</span> = <span class="var">sparql</span>.query().convert()
+
+<span class="kw">for</span> <span class="var">result</span> <span class="kw">in</span> <span class="var">results</span>[<span class="string">&quot;results&quot;</span>][<span class="string">&quot;bindings&quot;</span>]:
+   print(<span class="var">result</span>[<span class="string">&quot;entity&quot;</span>][<span class="string">&quot;value&quot;</span>] + <span class="string">&quot;, &quot;</span> + <span class="var">result</span>[<span class="string">&quot;label&quot;</span>][<span class="string">&quot;value&quot;</span>])
+</pre>
+</div>
+
+
+<h3 id="java">Querying a SPARQL endpoint from Java</h3>
+<p>
+To access IDSM from Java, <a target="_blank" href="https://jena.apache.org/">Apache Jena</a> can be used. Jena is a free and open source framework for building Semantic Web and Linked Data applications. This framework also includes a library for remote querying a SPARQL service.
+</p>
+<div class="highlight">
+<pre><span class="kw">import</span> <span class="class">org.apache.jena.rdfconnection.RDFConnection</span>;
+
+<span class="kw">public class</span> <span class="class">SPARQLQueryExample</span> {
+    <span class="kw">public static</span> <span class="type">void</span> main(<span class="class">String</span>[] <span class="var">args</span>) {
+        <span class="class">String</span> <span class="var">endpoint</span> = <span class="string">&quot;https://idsm.elixir-czech.cz/sparql/endpoint/idsm&quot;</span>;
+        <span class="class">String</span> <span class="var">query</span> = <span class="string">&quot;&quot;&quot;
+            PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+
+            SELECT * WHERE {
+              ?entity rdfs:label ?label
+            }
+            LIMIT 10
+            &quot;&quot;&quot;</span>;
+
+        <span class="kw">try</span>(<span class="class">RDFConnection</span> <span class="var">conn</span> = RDFConnection.connect(<span class="var">endpoint</span>)) {
+            <span class="var">conn</span>.querySelect(<span class="var">query</span>, (<span class="var">qs</span>) -&gt; {
+                System.out.println(<span class="var">qs</span>.get(<span class="string">&quot;entity&quot;</span>) + <span class="string">&quot;, &quot;</span> + <span class="var">qs</span>.get(<span class="sting">&quot;label&quot;</span>));
+            });
+        }
+    }
+}
+</pre>
+</div>
+
+
+<h3 id="shell">Querying a SPARQL endpoint from Bash</h3>
+<p>
+To access IDSM from Python, the <a target="_blank" href="https://curl.se/">curl</a> utility can be used. Curl is a command-line tool for transferring data specified with URL syntax. This tool is part of the vast majority of Linux distributions and is typically installed by default.
+</p>
+<div class="highlight">
+<pre>
+<span class="var">endpoint</span>=<span class="string">&quot;https://idsm.elixir-czech.cz/sparql/endpoint/idsm&quot;</span>
+<span class="var">query</span>=<span class="string">&quot;query=
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+
+SELECT * WHERE {
+  ?entity rdfs:label ?label
+}
+LIMIT 10&quot;</span>
+
+curl -H <span class="string">&quot;Accept: text/csv&quot;</span> --data-urlencode &quot;<span class="var">${query}</span>&quot; &quot;<span class="var">${endpoint}</span>&quot;
+</pre>
+</div>
+
+
+<h2 id="local">Local Access</h2>
+<p>
+IDSM is not designed to run locally on a personal computer or small server. It consists of a number of components, and its overall installation involves many steps. A loaded dataset is often very large, and the system tries to update it atomically, which requires a large amount of resources. For example, updating data from PubChemRDF can take up to two days and consume 1TB of RAM. For these reasons, we have always thought of IDSM as a server service and have not considered the possibility of local use. On the other hand, we do not prevent local use in any way. All source codes are freely available, including installation notes.
+</p>
+IDSM consists of the following components:
+<ul>
+<li><a target="_blank" href="https://github.com/idsm-src/chemweb">chemweb</a> - IDSM SPARQL engine</li>
+<li><a target="_blank" href="https://github.com/idsm-src/pgms">pgms</a> - PostgreSQL extension for mass spectrometry</li>
+<li><a target="_blank" href="https://github.com/idsm-src/pgsparql">pgsparql</a> - PostgreSQL extension for IDSM SPARQL engine support</li>
+<li><a target="_blank" href="https://github.com/idsm-src/sachem">sachem</a> - PostgreSQL extension for chemical substructure and similarity search</li>
+<li><a target="_blank" href="https://github.com/idsm-src/loaders">loaders</a> - IDSM dataset loaders</li>
+<li><a target="_blank" href="https://github.com/idsm-src/notes">notes</a> - IDSM installation notes</li>
+<li><a target="_blank" href="https://github.com/idsm-src/website">website</a> - IDSM website (not needed for local use)</li>
+</ul>
+<p>
+In addition, we have newly extended the installation notes with an <a target="_blank" href="https://github.com/idsm-src/notes/tree/develop/examples/docker/ms">example for Docker</a> that allows a user to run a subset of IDSM locally. This subset includes data from the MoNA and ISDB databases. This example will allow you to run two docker containers using the docker compose tool. The first container contains a PostgreSQL database with all the necessary extensions. The second container is built on top of Apache Tomcat and includes the IDSM SPARQL engine itself.
+</p>
+<p>
+To run the containers, please use the following command:
+</p>
+<pre>docker compose -f notes/examples/docker/ms/compose.yaml up -d</pre>
+<p>
+Once started, the SPARQL endpoint is available at <a target="_blank" href="http://localhost:8080/sparql/">http://localhost:8080/sparql/</a>.
+</p>
+<p>
+After starting the containers, the database is empty. Please use the following command to load data from ISDB:
+</p>
+<pre>docker compose -f notes/examples/docker/ms/compose.yaml exec db /usr/bin/load-isdb.sh</pre>
+<p>
+And the following command to load data from MoNA:
+</p>
+<pre>docker compose -f notes/examples/docker/ms/compose.yaml exec db /usr/bin/load-mona.sh</pre>
+<p>
+Note that you must have at least 64GB of RAM to load the data.
+</p>
+
+</body>
+</html>

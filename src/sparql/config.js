@@ -43,7 +43,7 @@ const endpoints = [{
   {
     name: "Rhea",
     endpoint: "https://sparql.rhea-db.org/sparql",
-    query: simpleCheckQuery
+    query: checkQuery
   },
   {
     name: "GlyCosmos",
@@ -63,7 +63,7 @@ const endpoints = [{
   {
     name: "Identifiers.org",
     endpoint: "https://sparql.api.identifiers.org/sparql",
-    query: simpleCheckQuery
+    query: checkQuery
   },
   {
     name: "IDSM",

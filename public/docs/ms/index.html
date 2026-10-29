@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>IDSM/MS User Manual</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+  <style>
+    body { text-align: justify; }
+    h1, h2, h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; }
+    table.table { margin-top: 1.5rem !important; margin-bottom: 2.5rem !important; }
+    img { margin-top: 1.5rem; margin-bottom: 2.5rem; }
+    pre { margin-top: 1.0rem; margin-bottom: 0.5rem; border: 1px solid #ddd; padding: 0.5rem;}
+
+    table.table td { padding: .1rem 1.5rem .1rem .5rem; vertical-align: middle; border-right-width: 1px; }
+    table.table td:last-child {  padding: .1rem .5rem .1rem .5rem; border-right-width: 0px; }
+    table.table th {  padding: .25rem .5rem .25rem .5rem; border-right-width: 1px; }
+    table.table th:last-child { padding: .25rem 1.5rem .25rem .5rem; border-right-width: 0px; }
+
+    .highlight .k  { color: #7F0055; font-weight: bold; }
+    .highlight .nv { color: #0000C0; }
+    .highlight .nn { color: #860e0e; }
+    .highlight .nt { color: #860e0e; }
+    .highlight .nl { color: #860e0e; }
+    .highlight .s  { color: #116644; }
+    .highlight .c  { color: #ea0000;}
+
+    .nav-link { padding: 0.2rem 0.5rem !important; margin: 0.1rem 0rem !important;  border-left: solid 2px rgba(0, 0, 0, 0);}
+
+    .nav-link.active { background-color: #eaf3f8; border-left: solid 2px #0d6efd; }
+
+    code { color: #0000C0; }
+  </style>
+
+
+</head>
+
+<body style="position: relative" data-bs-spy="scroll" data-bs-target="#navbar-example3">
+<div class="container-fluid" style="max-width: 1200px; margin:auto">
+<div class="row flex-nowrap">
+
+<div class="col-auto d-none d-md-block col-md-3 col-xl-3 px-0 bg-light">
+<div class="d-flex flex-column align-items-start min-vh-100 sticky-top">
+  <nav id="navbar-example3" class="w-100 navbar navbar-light bg-light px-2">
+    <ul class="w-100 nav flex-column mb-auto align-items-start" id="menu">
+      <li class="w-100 nav-item">
+        <a href="#item-0" class="nav-link align-middle px-0 fw-bold">Introduction</a>
+        <ul class="collapse show nav flex-column ms-1" id="submenu1">
+          <li class="w-100"><a href="#ontologies" class="nav-link px-0">Used ontologies</a></li>
+          <li class="w-100"><a href="#model" class="nav-link px-0">Data model</a></li>
+        </ul>
+      </li>
+      <li class="w-100 nav-item">
+        <a href="#item-1" class="w-100 nav-link px-0 align-middle fw-bold">Entities</a>
+        <ul class="collapse show nav flex-column ms-1" id="submenu2">
+          <li class="w-100"><a href="#experiment" class="nav-link px-0">Experiment</a></li>
+          <li class="w-100"><a href="#compound" class="nav-link px-0">Compound</a></li>
+          <li class="w-100"><a href="#spectrum" class="nav-link px-0">Spectrum</a></li>
+          <li class="w-100"><a href="#peak" class="nav-link px-0">Annotated peak</a></li>
+          <li class="w-100"><a href="#annotation" class="nav-link px-0">Annotation</a></li>
+          <li class="w-100"><a href="#library" class="nav-link px-0">Library</a></li>
+          <li class="w-100"><a href="#submitter" class="nav-link px-0">Submitter</a></li>
+        </ul>
+      </li>
+      <li class="w-100 nav-item">
+        <a href="#item-2" class="w-100 nav-link px-0 align-middle fw-bold">Functions</a>
+        <ul class="collapse show nav flex-column ms-1" id="submenu3">
+          <li class="w-100"><a href="#greedy" class="nav-link px-0">Greedy Cosine</a></li>
+          <li class="w-100"><a href="#hungarian" class="nav-link px-0">Hungarian Cosine</a></li>
+          <li class="w-100"><a href="#modified" class="nav-link px-0">Modified Cosine</a></li>
+        </ul>
+      </li>
+      <li class="w-100 nav-item">
+        <a href="#item-3" class="w-100 nav-link px-0 align-middle fw-bold">Examples</a>
+        <ul class="collapse show nav flex-column ms-1" id="submenu4">
+          <li class="w-100"><a href="#q1" class="nav-link px-0">Query 1</a></li>
+          <li class="w-100"><a href="#q2" class="nav-link px-0">Query 2</a></li>
+          <li class="w-100"><a href="#q3" class="nav-link px-0">Query 3</a></li>
+          <li class="w-100"><a href="#q4" class="nav-link px-0">Query 4</a></li>
+          <li class="w-100"><a href="#q5" class="nav-link px-0">Query 5</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+</div>
+
+
+<div class="col py-3">
+
+<h1 class="display-3 mt-3 fw-bold">IDSM/MS User Manual</h1>
+
+<h2 id="item-0">Introduction</h2>
+
+<h3 id="ontologies">Used ontologies</h3>
+<p>
+To fully represent the data, we opted for a general upper-level ontology, namely the Semanticscience Integrated Ontology (SIO).
+This ontology, which specializes in biomedical research and knowledge discovery, provides users with general descriptions
+of objects, processes, and their attributes. Using SIO, each entry of a mass spectrum database is represented as an experiment,
+which generates a mass spectrum from an input compound.
+</p>
+<p>
+Attributes in the SIO ontology represent independent entities, enabling types from other ontologies to be assigned.
+Specifically, we assigned types from the PSI–MS controlled vocabulary for attributes related to mass spectrometry,
+and from the Chemical Information Ontology (CHEMINF) (Hastings et al. 2011) for attributes related to compound properties.
+</p>
+<p>
+Another advantage of the SIO ontology is that it is used by the PubChemRDF and ChEMBL datasets, so representing
+the selected mass spectrum databases in this way seamlessly integrates with the overarching data model used in IDSM.
+</p>
+<p>
+In addition to the SIO ontology, the following ontologies are employed to represent selected datasets:
+the Units of Measurement Ontology (UO) (Rijgersberg et al. 2011) for units of measured values;
+Dublin Core Metadata Initiative Metadata Terms (DCMI Usage Board 2020) to express basic information about mass spectrum
+libraries and experiments; the vCard ontology (W3C 2014b) to express information about submitters;
+and the Simple Knowledge Organization System (SKOS) ontology (W3C 2009) to cross-link entities from different datasets.
+</p>
+<p>
+The prefixes related to the ontologies used are as follows:
+</p>
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">prefix</th><th scope="col">namespace</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf</td><td>http://www.w3.org/1999/02/22-rdf-syntax-ns#</td></tr>
+    <tr><td>rdfs</td><td>http://www.w3.org/2000/01/rdf-schema#</td></tr>
+    <tr><td>xsd</td><td>http://www.w3.org/2001/XMLSchema#</td></tr>
+    <tr><td>sio</td><td>http://semanticscience.org/resource/</td></tr>
+    <tr><td>obo</td><td>http://purl.obolibrary.org/obo/</td></tr>
+    <tr><td>dcterms</td><td>http://purl.org/dc/terms/</td></tr>
+    <tr><td>vcard</td><td>http://www.w3.org/2006/vcard/ns#</td></tr>
+    <tr><td>skos</td><td>http://www.w3.org/2004/02/skos/core#</td></tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="model">Data model</h3>
+<p>
+A record from a source mass spectroscopy dataset is represented as the mass spectrometry experiment (class sio:SIO_001180). The measured compound (class sio:SIO_011125) is related to the experiment as its input (property sio:SIO_000230). Similarly, the mass spectrum (class obo:MS_1000294) is related to the experiment as its output (property sio:SIO_000229). The mass spectrum entity refers (via property sio:SIO_000300) to the mass spectrum literal containing its own measured data, that is, the intensities of the mass-to-charge ratios.
+</p><p>
+The experiment, input compound, and output mass spectrum contain attributes encoded as separate entities. Each attribute has a type (property rdf:type) and a value (property sio:SIO_000300). Where necessary, the attribute also has a unit (property sio:SIO_000221) in addition to the value.
+</p><p>
+The experiment parameters, such as ion mode or collision energy, are encoded as attributes of appropriate types derived from the PSI–MS vocabulary and linked to the experiment (property sio:SIO_000553). Attributes representing chemical qualities and compound identifiers are categorized based on appropriate types from the CHEMINF ontology and linked to a compound (properties sio:SIO_000011 and sio:SIO_000672 respectively). In the case of the mass spectrum, its SPLASH identifier is represented in a similar way.
+</p><p>
+If the original record contains annotations of peaks, each annotated peak is represented as a separate entity (class obo:MS_1000231) and connected to the spectrum as its component part (property sio:SIO_000313) on a given mass-to-charge ratio position (property sio:SIO_000056).
+</p><p>
+Annotations of experiments (called tags in the MoNA database) and peaks are encoded as attributes of the type annotation (class sio:SIO_001166) and related to the corresponding entity (property sio:SIO_000254).
+</p><p>
+To preserve information about the origins of the records, the experiments are organized (property sio:SIO_001278) into datasets (class sio:SIO_000089) based on their original sources. Each experiment is also connected (property sio:SIO_000066) to a person (class vcard:Individual) who submits the corresponding original record into the original database.
+</p><p>
+The basic relationships between main entities are expressed in the following graph:
+</p>
+
+<img src="media/main.svg" alt="" width="100%" />
+
+<h2 id="item-1">Entities</h2>
+
+<h3 id="experiment">Experiment</h3>
+
+The experiment entity describes a mass spectrometry experiment (process) that generates a mass spectrum (process output)
+for a given compound (process input). Each experiment entity can have the following (outgoing) properties:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type             </td><td>type            </td><td>sio:SIO_001180 (mass spectrometry experiment)</td></tr>
+    <tr><td>sio:SIO_000230       </td><td>has input       </td><td><a href="#compound">instance of compound</a></td></tr>
+    <tr><td>sio:SIO_000229       </td><td>has output      </td><td><a href="#spectrum">instance of spectrum</a></td></tr>
+    <tr><td>sio:SIO_000066       </td><td>has provider    </td><td><a href="#submitter">instance of submitter</a></td></tr>
+    <tr><td>sio:SIO_001278       </td><td>is data item in </td><td><a href="#library">instance of library</a></td></tr>
+    <tr><td>sio:SIO_000255       </td><td>has annotation  </td><td><a href="#annotation">instance of annotation</a></td></tr>
+    <tr><td>sio:SIO_000552       </td><td>has parameter   </td><td><a href="#parameter">instance of parameter</a></td></tr>
+    <tr><td>dcterms:created      </td><td>created         </td><td>xsd:date literal</td></tr>
+    <tr><td>dcterms:dateAccepted </td><td>curated         </td><td>xsd:date literal</td></tr>
+    <tr><td>dcterms:modified     </td><td>updated         </td><td>xsd:date literal</td></tr>
+  </tbody>
+</table>
+
+<h4 id="parameter">Experiment parameters</h4>
+
+Process parameters are coded as separate entities. Each entity has its own type and, depending on this type, possibly
+a value and, optionally, a unit of that value. So the following are the possible properties:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type</td></tr>
+    <tr><td>sio:SIO_000300 </td><td>has value</td></tr>
+    <tr><td>sio:SIO_000221 </td><td>has unit</td></tr>
+  </tbody>
+</table>
+
+Below are the allowable parameter types, the corresponding value types, and possible units, if applicable:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">parameter</th><th scope="col">type</th><th>value class</th><th>unit class</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ms level</td><td>obo:MS_1000511</td><td>xsd:int</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>ionization mode</td><td>obo:MS_1000129 (negative)<br/>obo:MS_1000130 (positive)</td><td>no value</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>ionization type</td>
+      <td>
+        obo:MS_1000070 (APCI)<br/>
+        obo:MS_1000071 (CI)<br/>
+        obo:MS_1000073 (ESI)<br/>
+        obo:MS_1000074 (FAB)<br/>
+        obo:MS_1000075 (MALDI)<br/>
+        obo:MS_1000258 (FI)<br/>
+        obo:MS_1000389 (EI)<br/>
+        obo:MS_1000398 (nanoES)<br/>
+      </td><td>no value</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>precursor type</td><td>obo:MS_1002813</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>precursor mz</td><td>obo:MS_1000744</td><td>xsd:float</td>
+      <td>obo:MS_1000040 (mz)</td>
+    </tr>
+    <tr>
+      <td>instrument type</td><td>obo:MS_1000463</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>instrument model</td><td>obo:MS_1000031</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+    <tr>
+      <td>retention time</td><td>obo:MS_1000894</td><td>xsd:float</td>
+      <td>obo:UO_0000010 (second)<br/>obo:UO_0000031 (minute)<br/>or none</td>
+    </tr>
+    <tr>
+      <td>collision energy</td><td>obo:MS_1000045</td><td>xsd:float</td>
+      <td>obo:UO_0000218 (volt)<br/>obo:UO_0000248 (kilovolt)<br/>obo:UO_0000266 (electronvolt)<br/>or none</td>
+    </tr>
+    <tr>
+      <td>collision energy ramp</td><td>obo:MS_1002013 (start)<br/>obo:MS_1002014 (end)</td><td>xsd:float</td>
+      <td>obo:UO_0000218 (volt)<br/>obo:UO_0000266 (electronvolt)<br/>or none</td>
+    </tr>
+    <tr>
+      <td>normalized collision energy</td><td>obo:MS_1000138</td><td>xsd:float</td>
+      <td>obo:UO_0000190 (ratio unit)</td>
+    </tr>
+    <tr>
+      <td>normalized collision energy ramp</td><td>obo:MS_1002218 (start)<br/>obo:MS_1002219 (end)</td><td>xsd:float</td>
+      <td>obo:UO_0000190 (ratio unit)</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<h3 id="compound">Compound</h3>
+
+Each compound is represented by a standalone entity. The following (outgoing) properties are possible:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type                </td><td>type           </td><td>sio:SIO_011125 (molecule)<br/>ClassyFire class<br/>ChEBI class</td></tr>
+    <tr><td>skos:closeMatch         </td><td>related to     </td><td>MeSH class</td></tr>
+    <tr><td>sio:SIO_000231          </td><td>is input in    </td><td><a href="#experiment">instance of experiment</a></td></tr>
+    <tr><td>sio:SIO_000008          </td><td>has attribute  </td><td><a href="#desctiptor">instance of desctiptor</a></td></tr>
+    <tr><td>sio:SIO_000671          </td><td>has identifier </td><td><a href="#identifier">instance of identifier</a></td></tr>
+  </tbody>
+</table>
+
+<h4 id="desctiptor">Compound desciptors</h4>
+
+Various properties of a compound (arising from its structure) are coded as its descriptors. Each descriptor has its
+own type and value, and optionally a unit of that value. So the following are the possible properties:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type</td></tr>
+    <tr><td>sio:SIO_000300 </td><td>has value</td></tr>
+    <tr><td>sio:SIO_000221 </td><td>has unit</td></tr>
+  </tbody>
+</table>
+
+Below are the allowable descriptor types, the corresponding value types, and possible units, if applicable:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">descriptor name</th><th scope="col">descriptor class</th><th>descriptor value class</th><th>descriptor unit class</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>molfile</td><td>sio:SIO_011120</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>name</td><td>sio:CHEMINF_000043</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>InChI</td><td>sio:CHEMINF_000113</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>InChIKey</td><td>sio:CHEMINF_000059</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>molecular formula</td><td>sio:CHEMINF_000042</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>SMILES</td><td>sio:CHEMINF_000018</td><td>xsd:string</td>
+      <td>no unit</td>
+    </tr>
+
+    <tr>
+      <td>exact mass</td><td>sio:CHEMINF_000217</td><td>xsd:float</td>
+      <td>obo:UO_0000055 (molar mass)</td>
+    </tr>
+
+    <tr>
+      <td>monoisotopic mass</td><td>sio:CHEMINF_000218</td><td>xsd:float</td>
+      <td>obo:UO_0000055 (molar mass)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="identifier">Compound identifiers</h4>
+
+A compound identifier is represented as a separate entity having its own type and string value:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type</td></tr>
+    <tr><td>sio:SIO_000300 </td><td>has value</td></tr>
+  </tbody>
+</table>
+
+The following types of compound identifiers are possible:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">identifier name</th><th scope="col">identifier class</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>CAS registry number</td><td>sio:CHEMINF_000446</td></tr>
+    <tr><td>HMDB identifier</td><td>sio:CHEMINF_000408</td></tr>
+    <tr><td>ChEBI identifier</td><td>sio:CHEMINF_000407</td></tr>
+    <tr><td>ChemSpider identifier</td><td>sio:CHEMINF_000405</td></tr>
+    <tr><td>KEGG identifier</td><td>sio:CHEMINF_000409</td></tr>
+    <tr><td>LipidMaps identifier</td><td>sio:CHEMINF_000564</td></tr>
+    <tr><td>PubChem compound identifier (CID)</td><td>sio:CHEMINF_000140</td></tr>
+    <tr><td>PubChem substance identifier (SID)</td><td>sio:CHEMINF_000141</td></tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="spectrum">Spectrum</h3>
+
+Each mass spectrum is represented as a separate entity, which has the measured spectrum as its literal value.
+If the spectrum contains annotated peaks, these are represented as component parts of the spectrum.
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type                </td><td>type               </td><td>obo:MS_1000294 (mass spectrum)<br/>obo:MS_1000579 (MS1 spectrum)<br/>obo:MS_1000580 (MSn spectrum)</td></tr>
+    <tr><td>sio:SIO_000232          </td><td>is output of       </td><td><a href="#experiment">instance of experiment</a></td></tr>
+    <tr><td>sio:SIO_000671          </td><td>has identifier     </td><td><a href="#splash">instance of identifier</a></td></tr>
+    <tr><td>sio:SIO_000369          </td><td>has component part </td><td><a href="#peak">instance of peak</a></td></tr>
+    <tr><td>sio:SIO_000300          </td><td>has value          </td><td>ms:spectrum literal</td></tr>
+  </tbody>
+</table>
+
+
+<h4 id="splash">Spectrum identifiers</h4>
+
+A spectrum identifier is represented as a separate entity having its own type and string value:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type</td></tr>
+    <tr><td>sio:SIO_000300 </td><td>has value</td></tr>
+  </tbody>
+</table>
+
+The following types of spectrum identifiers are possible:
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">identifier name</th><th scope="col">identifier class</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>SPLASH key</td><td>obo:MS_1002599</td></tr>
+  </tbody>
+</table>
+
+
+<h3 id="peak">Annotated peak</h3>
+
+If a spectrum contains an annotation of a peak, this peak is represented as a standalone entity, which allows the
+annotation to be attached to the peak. The mz value of the peak represents its position in the spectrum.
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type                 </td><td>obo:MS_1000231 (peak)</td></tr>
+    <tr><td>sio:SIO_000313 </td><td>is component part of </td><td><a href="#spectrum">instance of spectrum</a></td></tr>
+    <tr><td>sio:SIO_000255 </td><td>has annotation       </td><td><a href="#annotation">instance of annotation</a></td></tr>
+    <tr><td>sio:SIO_000056 </td><td>position             </td><td>xsd:float literal</td></tr>
+  </tbody>
+</table>
+
+
+<h3 id="annotation">Annotation</h3>
+
+Annotations are represented as separate entities that can be attached either to a peak or to an experiment
+(in this case, they are equivalent to MoNA tags).
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type       </td><td>type             </td><td>sio:SIO_001166 (annotation)</td></tr>
+    <tr><td>sio:SIO_000254 </td><td>is annotation of </td><td><a href="#experiment">instance of experiment</a> or <a href="#peak">peak</a></td></tr>
+    <tr><td>sio:SIO_000300 </td><td>has value        </td><td>xsd:string literal</td></tr>
+  </tbody>
+</table>
+
+
+
+<h3 id="library">Library</h3>
+
+Individual experiments (spectra) are grouped into datasets based on their origin.
+These datasets are represented as (data) libraries.
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type            </td><td>type          </td><td>sio:SIO_000089 (dataset)</td></tr>
+    <tr><td>sio:SIO_001277      </td><td>has data item </td><td><a href="#experiment">instance of experiment</a></td></tr>
+    <tr><td>dcterms:title       </td><td>title         </td><td>xsd:string literal</td></tr>
+    <tr><td>dcterms:description </td><td>description   </td><td>xsd:string literal</td></tr>
+  </tbody>
+</table>
+
+
+<h3 id="submitter">Submitter</h3>
+
+This entity describes information about the person who submitted the record to the original dataset.
+
+<table class="table mt-2 mb-4">
+  <thead>
+    <tr><th scope="col">property</th><th scope="col">name</th><th>value</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>rdf:type                </td><td>type           </td><td>vcard:Individual</td></tr>
+    <tr><td>sio:SIO_000064          </td><td>is provider of </td><td><a href="#experiment">instance of experiment</a></td></tr>
+    <tr><td>vcard:given-name        </td><td>first name     </td><td>xsd:string literal</td></tr>
+    <tr><td>vcard:family-name       </td><td>last name      </td><td>xsd:string literal</td></tr>
+    <tr><td>vcard:hasEmail          </td><td>email address  </td><td>email IRI</td></tr>
+    <tr><td>vcard:organization-name </td><td>insttitution   </td><td>xsd:string literal</td></tr>
+  </tbody>
+</table>
+
+
+<h2 id="item-2">Mass spectrometry functions</h2>
+<h3 id="greedy">Greedy Cosine</h3>
+
+<p>
+Calculate ‘cosine similarity score’ between two spectra.
+</p>
+
+<p>
+<code><b>ms:cosineGreedy</b>(spectrum 1, spectrum 2, tolerance, mz power, intensity power)</code>
+</p>
+
+<p>
+The cosine score aims at quantifying the similarity between two mass spectra. The score is calculated by finding best
+possible matches between peaks of two spectra. Two peaks are considered a potential match if their m/z ratios lie within
+the given ‘tolerance’. The underlying peak assignment problem is here solved in a ‘greedy’ way. This can perform notably
+faster, but does occasionally deviate slightly from a fully correct solution
+(as with the Hungarian algorithm, see <a href="#hungarian">Hungarian Cosine</a>).
+In practice this will rarely affect similarity scores notably, in particular for smaller tolerances.
+The implementation of this function (as well as this description) was taken from
+<a href="https://matchms.readthedocs.io/en/latest/api/matchms.similarity.CosineGreedy.html">the matchms project</a>.
+</p>
+
+<p>
+The function has these optional parameters:
+</p>
+
+<dl>
+  <dt>tolerance</dt>
+  <dd>Peaks will be considered a match when &lt;= tolerance apart. Default is 0.1.</dd>
+  <dt>mz power</dt>
+  <dd>The power to raise m/z to in the cosine function. The default is 0, in which case the peak intensity products will not depend on the m/z ratios.</dd>
+  <dt>intensity power</dt>
+  <dd>The power to raise intensity to in the cosine function. The default is 1.</dd>
+</dl>
+
+
+<h3 id="hungarian">Hungarian Cosine</h3>
+<p>
+Calculate ‘cosine similarity score’ between two spectra (using Hungarian algorithm).
+</p>
+
+<p>
+<code><b>ms:cosineHungarian</b>(spectrum 1, spectrum 2, tolerance, mz power, intensity power)</code>
+</p>
+
+<p>
+The cosine score aims at quantifying the similarity between two mass spectra. The score is calculated by finding best
+possible matches between peaks of two spectra. Two peaks are considered a potential match if their m/z ratios lie within
+the given ‘tolerance’. The underlying peak assignment problem is here solved using the Hungarian algorithm. This can
+perform notably slower than the ‘greedy’ implementation in <a href="#greedy">Greedy Cosine</a>,
+but does represent a mathematically proper solution to the problem.
+The implementation of this function (as well as this description) was taken from
+<a href="https://matchms.readthedocs.io/en/latest/api/matchms.similarity.CosineHungarian.html">the matchms project</a>.
+</p>
+
+<p>
+The function has these optional parameters:
+</p>
+
+<dl>
+  <dt>tolerance</dt>
+  <dd>Peaks will be considered a match when &lt;= tolerance apart. Default is 0.1.</dd>
+  <dt>mz power</dt>
+  <dd>The power to raise m/z to in the cosine function. The default is 0, in which case the peak intensity products will not depend on the m/z ratios.</dd>
+  <dt>intensity power</dt>
+  <dd>The power to raise intensity to in the cosine function. The default is 1.</dd>
+</dl>
+
+
+<h3 id="modified">Modified Cosine</h3>
+
+<p>
+Calculate ‘modified cosine score’ between mass spectra.
+</p>
+
+<p>
+<code><b>ms:modifiedCosine</b>(spectrum 1, spectrum 2, shift, tolerance, mz power, intensity power)</code>
+</p>
+
+<p>
+The modified cosine score aims at quantifying the similarity between two mass spectra. The score is calculated by
+finding best possible matches between peaks of two spectra. Two peaks are considered a potential match if their m/z
+ratios lie within the given ‘tolerance’, or if their m/z ratios lie within the tolerance once a mass-shift is applied.
+The mass shift is simply the difference in precursor-m/z between the two spectra.
+See <a href="https://www.pnas.org/content/109/26/E1743">Watrous et al.</a> (PNAS, 2012) for further details.
+The implementation of this function (as well as this description) was taken from
+<a href="https://matchms.readthedocs.io/en/latest/api/matchms.similarity.ModifiedCosine.html">the matchms project</a>.
+</p>
+
+<p>
+The function has these optional parameters:
+</p>
+
+<dl>
+  <dt>tolerance</dt>
+  <dd>Peaks will be considered a match when &lt;= tolerance apart. Default is 0.1.</dd>
+  <dt>mz power</dt>
+  <dd>The power to raise m/z to in the cosine function. The default is 0, in which case the peak intensity products will not depend on the m/z ratios.</dd>
+  <dt>intensity power</dt>
+  <dd>The power to raise intensity to in the cosine function. The default is 1.</dd>
+</dl>
+
+
+<h2 id="item-3">Examples</h2>
+
+The following examples of SPARQL queries illustrate how mass spectra stored in IDSM can be searched and combined
+with other data stored in IDSM or in other databases (available via a SPARQL endpoint).
+
+<h3 id="q1">Query 1</h3>
+
+The example query selects all compounds whose spectra are similar to a given mass spectrum query.
+To calculate similarities between mass spectra, the cosine similarity algorithm is used.
+
+<div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">sio</span><span class="p">:</span> <span class="nl">&lt;http://semanticscience.org/resource/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">ms</span><span class="p">:</span> <span class="nl">&lt;http://bioinfo.uochb.cas.cz/rdf/v1.0/ms#&gt;</span>
+
+<span class="c"># select compounds whose spectra are similar to a given spectrum</span>
+<span class="k">SELECT</span> <span class="nv">?COMPOUND</span> <span class="nv">?SCORE</span> <span class="k">WHERE</span>
+<span class="p">{</span>
+  <span class="c"># bind the spectrum query into variable ?MSQUERY</span>
+  <span class="k">BIND</span><span class="p">(</span><span class="s">&quot;&quot;&quot;39:5 40:6 44:1 63:6 76:6 91:7 113:6
+          114:2 115:5 142:3 170:3 171:7 182:6
+          210:100 212:2&quot;&quot;&quot;</span><span class="o">^^</span><span class="nn">ms</span><span class="p">:</span><span class="nt">spectrum</span> <span class="k">AS</span> <span class="nv">?MSQUERY</span><span class="p">)</span>
+
+  <span class="c"># select all spectra and corresponding input compounds</span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000230</span> <span class="nv">?COMPOUND</span><span class="p">.</span> <span class="c"># has input </span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000229</span> <span class="nv">?SPECTRUM</span><span class="p">.</span> <span class="c"># has output</span>
+  <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSVALUE</span><span class="p">.</span> <span class="c"># has value</span>
+
+  <span class="c"># compute similarities between the spectrum query and the selected spectra</span>
+  <span class="k">BIND</span><span class="p">(</span><span class="nn">ms</span><span class="p">:</span><span class="nt">cosineHungarian</span><span class="p">(</span><span class="nv">?MSQUERY</span><span class="p">,</span> <span class="nv">?MSVALUE</span><span class="p">)</span> <span class="k">as</span> <span class="nv">?SCORE</span><span class="p">)</span>
+
+  <span class="c"># filter out results with similarity scores less than 0.85</span>
+  <span class="k">FILTER</span><span class="p">(</span><span class="nv">?SCORE</span> <span class="o">&gt;=</span> <span class="mf">0.85</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">ORDER BY</span> <span class="k">DESC</span><span class="p">(</span><span class="nv">?SCORE</span><span class="p">)</span>
+</pre></div>
+
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/chemweb/?query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20ms%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fms%23%3E%0A%0A%23%20select%20compounds%20whose%20spectra%20are%20similar%20to%20a%20given%20spectrum%0ASELECT%20%3FCOMPOUND%20%3FSCORE%20WHERE%0A%7B%0A%20%20%23%20bind%20the%20spectrum%20query%20into%20variable%20%3FMSQUERY%0A%20%20BIND(%22%22%2239%3A5%2040%3A6%2044%3A1%2063%3A6%2076%3A6%2091%3A7%20113%3A6%0A%20%20%20%20%20%20%20%20%20%20114%3A2%20115%3A5%20142%3A3%20170%3A3%20171%3A7%20182%3A6%0A%20%20%20%20%20%20%20%20%20%20210%3A100%20212%3A2%22%22%22%5E%5Ems%3Aspectrum%20AS%20%3FMSQUERY)%0A%0A%20%20%23%20select%20all%20spectra%20and%20corresponding%20input%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%0A%20%20%23%20compute%20similarities%20between%20the%20spectrum%20query%20and%20the%20selected%20spectra%0A%20%20BIND(ms%3AcosineHungarian(%3FMSQUERY%2C%20%3FMSVALUE)%20as%20%3FSCORE)%0A%0A%20%20%23%20filter%20out%20results%20with%20similarity%20scores%20less%20than%200.85%0A%20%20FILTER(%3FSCORE%20%3E%3D%200.85)%0A%7D%0AORDER%20BY%20DESC(%3FSCORE)">Run in ChemWeb</a>
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/sparql#query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20ms%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fms%23%3E%0A%0A%23%20select%20compounds%20whose%20spectra%20are%20similar%20to%20a%20given%20spectrum%0ASELECT%20%3FCOMPOUND%20%3FSCORE%20WHERE%0A%7B%0A%20%20%23%20bind%20the%20spectrum%20query%20into%20variable%20%3FMSQUERY%0A%20%20BIND(%22%22%2239%3A5%2040%3A6%2044%3A1%2063%3A6%2076%3A6%2091%3A7%20113%3A6%0A%20%20%20%20%20%20%20%20%20%20114%3A2%20115%3A5%20142%3A3%20170%3A3%20171%3A7%20182%3A6%0A%20%20%20%20%20%20%20%20%20%20210%3A100%20212%3A2%22%22%22%5E%5Ems%3Aspectrum%20AS%20%3FMSQUERY)%0A%0A%20%20%23%20select%20all%20spectra%20and%20corresponding%20input%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%0A%20%20%23%20compute%20similarities%20between%20the%20spectrum%20query%20and%20the%20selected%20spectra%0A%20%20BIND(ms%3AcosineHungarian(%3FMSQUERY%2C%20%3FMSVALUE)%20as%20%3FSCORE)%0A%0A%20%20%23%20filter%20out%20results%20with%20similarity%20scores%20less%20than%200.85%0A%20%20FILTER(%3FSCORE%20%3E%3D%200.85)%0A%7D%0AORDER%20BY%20DESC(%3FSCORE)&endpoint=https%3A%2F%2Fidsm.elixir-czech.cz%2Fsparql%2Fendpoint%2Fidsm&requestMethod=POST&tabTitle=IDSM%2FMS%20Example%20Query%201&headers=%7B%7D&contentTypeConstruct=application%2Fn-triples%2C*%2F*%3Bq%3D0.9&contentTypeSelect=application%2Fsparql-results%2Bjson%2C*%2F*%3Bq%3D0.9&outputFormat=table">Run in SPARQL GUI</a>
+
+
+<h3 id="q2">Query 2</h3>
+
+The example query selects mass spectra of compounds that contain the structure of aspirin as their substructure.
+The query structure is encoded by SMILES.
+
+<div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">sio</span><span class="p">:</span> <span class="nl">&lt;http://semanticscience.org/resource/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">sachem</span><span class="p">:</span> <span class="nl">&lt;http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#&gt;</span>
+
+<span class="c"># select spectra of compounds that contain a given substructure</span>
+<span class="k">SELECT</span> <span class="nv">?COMPOUND</span> <span class="nv">?SPECTRUM</span> <span class="nv">?MSVALUE</span> <span class="k">WHERE</span> 
+<span class="p">{</span>
+  <span class="c"># search for compounds containing the substructure</span>
+  <span class="nv">?COMPOUND</span> <span class="nn">sachem</span><span class="p">:</span><span class="nt">substructureSearch</span> <span class="p">[</span>
+      <span class="nn">sachem</span><span class="p">:</span><span class="nt">query</span> <span class="s">&quot;CC(=O)OC1=CC=CC=C1C(=O)O&quot;</span><span class="p">;</span>
+      <span class="nn">sachem</span><span class="p">:</span><span class="nt">tautomerMode</span> <span class="nn">sachem</span><span class="p">:</span><span class="nt">inchiTautomers</span> <span class="p">].</span>
+
+  <span class="c"># select mass spectra of the compounds found</span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000230</span> <span class="nv">?COMPOUND</span><span class="p">.</span> <span class="c"># has input </span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000229</span> <span class="nv">?SPECTRUM</span><span class="p">.</span> <span class="c"># has output</span>
+  <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSVALUE</span><span class="p">.</span> <span class="c"># has value</span>
+<span class="p">}</span>
+</pre></div>
+
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/chemweb/?query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20sachem%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fsachem%23%3E%0A%0A%23%20select%20spectra%20of%20compounds%20that%20contain%20a%20given%20substructure%0ASELECT%20%3FCOMPOUND%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%20%0A%7B%0A%20%20%23%20search%20for%20compounds%20containing%20the%20substructure%0A%20%20%3FCOMPOUND%20sachem%3AsubstructureSearch%20%5B%0A%20%20%20%20%20%20sachem%3Aquery%20%22CC(%3DO)OC1%3DCC%3DCC%3DC1C(%3DO)O%22%3B%0A%20%20%20%20%20%20sachem%3AtautomerMode%20sachem%3AinchiTautomers%20%5D.%0A%0A%20%20%23%20select%20mass%20spectra%20of%20the%20compounds%20found%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%7D">Run in ChemWeb</a>
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/sparql#query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20sachem%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fsachem%23%3E%0A%0A%23%20select%20spectra%20of%20compounds%20that%20contain%20a%20given%20substructure%0ASELECT%20%3FCOMPOUND%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%20%0A%7B%0A%20%20%23%20search%20for%20compounds%20containing%20the%20substructure%0A%20%20%3FCOMPOUND%20sachem%3AsubstructureSearch%20%5B%0A%20%20%20%20%20%20sachem%3Aquery%20%22CC(%3DO)OC1%3DCC%3DCC%3DC1C(%3DO)O%22%3B%0A%20%20%20%20%20%20sachem%3AtautomerMode%20sachem%3AinchiTautomers%20%5D.%0A%0A%20%20%23%20select%20mass%20spectra%20of%20the%20compounds%20found%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%7D&endpoint=https%3A%2F%2Fidsm.elixir-czech.cz%2Fsparql%2Fendpoint%2Fidsm&requestMethod=POST&tabTitle=IDSM%2FMS%20Example%20Query%202&headers=%7B%7D&contentTypeConstruct=application%2Fn-triples%2C*%2F*%3Bq%3D0.9&contentTypeSelect=application%2Fsparql-results%2Bjson%2C*%2F*%3Bq%3D0.9&outputFormat=table">Run in SPARQL GUI</a>
+
+
+<h3 id="q3">Query 3</h3>
+
+The example query selects mass spectra of compounds that were tested positive against the target protein:ACCQ9UPY5 (cystine/glutamate transporter).
+
+<div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">sio</span><span class="p">:</span> <span class="nl">&lt;http://semanticscience.org/resource/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">bao</span><span class="p">:</span> <span class="nl">&lt;http://www.bioassayontology.org/bao#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">obo</span><span class="p">:</span> <span class="nl">&lt;http://purl.obolibrary.org/obo/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">protein</span><span class="p">:</span> <span class="nl">&lt;http://rdf.ncbi.nlm.nih.gov/pubchem/protein/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">vocab</span><span class="p">:</span> <span class="nl">&lt;http://rdf.ncbi.nlm.nih.gov/pubchem/vocabulary#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">skos</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2004/02/skos/core#&gt;</span>
+
+<span class="c"># select spectra of compounds that were tested positive against a given target</span>
+<span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?COMPOUND</span> <span class="nv">?SPECTRUM</span> <span class="nv">?MSVALUE</span> <span class="k">WHERE</span> 
+<span class="p">{</span>
+  <span class="c"># select mass spectra of compounds</span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000230</span> <span class="nv">?COMPOUND</span><span class="p">.</span> <span class="c"># has input </span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000229</span> <span class="nv">?SPECTRUM</span><span class="p">.</span> <span class="c"># has output</span>
+  <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSVALUE</span><span class="p">.</span> <span class="c"># has value  </span>
+
+  <span class="c"># select pubchem equivalents of the compounds</span>
+  <span class="nv">?COMPOUND</span> <span class="nn">skos</span><span class="p">:</span><span class="nt">closeMatch</span> <span class="nv">?PUBCHEM_COMPOUND</span><span class="p">.</span>
+
+  <span class="c"># limit them to those that were tested positive against the target</span>
+  <span class="nv">?BIOASSAY</span> <span class="nn">bao</span><span class="p">:</span><span class="nt">BAO_0000209</span> <span class="nv">?MEASUREGROUP</span><span class="p">.</span> <span class="c"># has measure group</span>
+  <span class="nv">?MEASUREGROUP</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">RO_0000057</span> <span class="nn">protein</span><span class="p">:</span><span class="nt">ACCQ9UPY5</span><span class="p">.</span> <span class="c"># has participant</span>
+  <span class="nv">?MEASUREGROUP</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">OBI_0000299</span> <span class="nv">?ENDPOINT</span><span class="p">.</span> <span class="c"># has specified output</span>
+  <span class="nv">?ENDPOINT</span> <span class="nn">vocab</span><span class="p">:</span><span class="nt">PubChemAssayOutcome</span> <span class="nn">vocab</span><span class="p">:</span><span class="nt">active</span><span class="p">.</span>
+  <span class="nv">?ENDPOINT</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000136</span> <span class="nv">?SUBSTANCE</span><span class="p">.</span> <span class="c"># is about</span>
+  <span class="nv">?SUBSTANCE</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">CHEMINF_000477</span> <span class="nv">?PUBCHEM_COMPOUND</span><span class="p">.</span> <span class="c"># has normalized counterpart</span>
+<span class="p">}</span>
+</pre></div>
+
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/chemweb/?query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20bao%3A%20%3Chttp%3A%2F%2Fwww.bioassayontology.org%2Fbao%23%3E%0APREFIX%20obo%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2F%3E%0APREFIX%20protein%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fprotein%2F%3E%0APREFIX%20vocab%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fvocabulary%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0A%0A%23%20select%20spectra%20of%20compounds%20that%20were%20tested%20positive%20against%20a%20given%20target%0ASELECT%20DISTINCT%20%3FCOMPOUND%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%20%0A%7B%0A%20%20%23%20select%20mass%20spectra%20of%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%20%20%0A%20%20%0A%20%20%23%20select%20pubchem%20equivalents%20of%20the%20compounds%0A%20%20%3FCOMPOUND%20skos%3AcloseMatch%20%3FPUBCHEM_COMPOUND.%0A%0A%20%20%23%20limit%20them%20to%20those%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%3FBIOASSAY%20bao%3ABAO_0000209%20%3FMEASUREGROUP.%20%23%20has%20measure%20group%0A%20%20%3FMEASUREGROUP%20obo%3ARO_0000057%20protein%3AACCQ9UPY5.%20%23%20has%20participant%0A%20%20%3FMEASUREGROUP%20obo%3AOBI_0000299%20%3FENDPOINT.%20%23%20has%20specified%20output%0A%20%20%3FENDPOINT%20vocab%3APubChemAssayOutcome%20vocab%3Aactive.%0A%20%20%3FENDPOINT%20obo%3AIAO_0000136%20%3FSUBSTANCE.%20%23%20is%20about%0A%20%20%3FSUBSTANCE%20sio%3ACHEMINF_000477%20%3FPUBCHEM_COMPOUND.%20%23%20has%20normalized%20counterpart%0A%7D">Run in ChemWeb</a>
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/sparql#query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20bao%3A%20%3Chttp%3A%2F%2Fwww.bioassayontology.org%2Fbao%23%3E%0APREFIX%20obo%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2F%3E%0APREFIX%20protein%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fprotein%2F%3E%0APREFIX%20vocab%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fvocabulary%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0A%0A%23%20select%20spectra%20of%20compounds%20that%20were%20tested%20positive%20against%20a%20given%20target%0ASELECT%20DISTINCT%20%3FCOMPOUND%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%20%0A%7B%0A%20%20%23%20select%20mass%20spectra%20of%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%20%20%0A%20%20%0A%20%20%23%20select%20pubchem%20equivalents%20of%20the%20compounds%0A%20%20%3FCOMPOUND%20skos%3AcloseMatch%20%3FPUBCHEM_COMPOUND.%0A%0A%20%20%23%20limit%20them%20to%20those%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%3FBIOASSAY%20bao%3ABAO_0000209%20%3FMEASUREGROUP.%20%23%20has%20measure%20group%0A%20%20%3FMEASUREGROUP%20obo%3ARO_0000057%20protein%3AACCQ9UPY5.%20%23%20has%20participant%0A%20%20%3FMEASUREGROUP%20obo%3AOBI_0000299%20%3FENDPOINT.%20%23%20has%20specified%20output%0A%20%20%3FENDPOINT%20vocab%3APubChemAssayOutcome%20vocab%3Aactive.%0A%20%20%3FENDPOINT%20obo%3AIAO_0000136%20%3FSUBSTANCE.%20%23%20is%20about%0A%20%20%3FSUBSTANCE%20sio%3ACHEMINF_000477%20%3FPUBCHEM_COMPOUND.%20%23%20has%20normalized%20counterpart%0A%7D&endpoint=https%3A%2F%2Fidsm.elixir-czech.cz%2Fsparql%2Fendpoint%2Fidsm&requestMethod=POST&tabTitle=IDSM%2FMS%20Example%20Query%203&headers=%7B%7D&contentTypeConstruct=application%2Fn-triples%2C*%2F*%3Bq%3D0.9&contentTypeSelect=application%2Fsparql-results%2Bjson%2C*%2F*%3Bq%3D0.9&outputFormat=table">Run in SPARQL GUI</a>
+
+
+<h3 id="q4">Query 4</h3>
+
+The example query selects mass spectra that are similar to the mass spectra of compounds that were tested positive against the target protein:ACCQ9UPY5 (cystine/glutamate transporter).
+
+<div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">sio</span><span class="p">:</span> <span class="nl">&lt;http://semanticscience.org/resource/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">bao</span><span class="p">:</span> <span class="nl">&lt;http://www.bioassayontology.org/bao#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">obo</span><span class="p">:</span> <span class="nl">&lt;http://purl.obolibrary.org/obo/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">protein</span><span class="p">:</span> <span class="nl">&lt;http://rdf.ncbi.nlm.nih.gov/pubchem/protein/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">vocab</span><span class="p">:</span> <span class="nl">&lt;http://rdf.ncbi.nlm.nih.gov/pubchem/vocabulary#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">skos</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2004/02/skos/core#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">ms</span><span class="p">:</span> <span class="nl">&lt;http://bioinfo.uochb.cas.cz/rdf/v1.0/ms#&gt;</span>
+
+<span class="c"># select spectra similar to spectra of compounds tested positive against a given target</span>
+<span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?SPECTRUM</span> <span class="nv">?MSVALUE</span> <span class="k">WHERE</span>
+<span class="p">{</span>
+  <span class="c"># select spectra of compounds that were tested positive against the target</span>
+  <span class="p">{</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?MSQUERY</span> <span class="k">WHERE</span>
+    <span class="p">{</span>
+      <span class="c"># select mass spectra of compounds</span>
+      <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000229</span> <span class="nv">?SPECTRUM</span><span class="p">.</span> <span class="c"># has input</span>
+      <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000230</span> <span class="nv">?COMPOUND</span><span class="p">.</span> <span class="c"># has output</span>
+      <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSQUERY</span><span class="p">.</span> <span class="c"># has value</span>
+
+      <span class="c"># select pubchem equivalents of the compounds</span>
+      <span class="nv">?COMPOUND</span> <span class="nn">skos</span><span class="p">:</span><span class="nt">closeMatch</span> <span class="nv">?PUBCHEM_COMPOUND</span><span class="p">.</span> <span class="c"># has value</span>
+
+      <span class="c"># limit them to those that were tested positive against the target</span>
+      <span class="nv">?BIOASSAY</span> <span class="nn">bao</span><span class="p">:</span><span class="nt">BAO_0000209</span> <span class="nv">?MEASUREGROUP</span><span class="p">.</span> <span class="c"># has measure group</span>
+      <span class="nv">?MEASUREGROUP</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">RO_0000057</span> <span class="nn">protein</span><span class="p">:</span><span class="nt">ACCQ9UPY5</span><span class="p">.</span> <span class="c"># has participant</span>
+      <span class="nv">?MEASUREGROUP</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">OBI_0000299</span> <span class="nv">?ENDPOINT</span><span class="p">.</span> <span class="c"># has specified output</span>
+      <span class="nv">?ENDPOINT</span> <span class="nn">vocab</span><span class="p">:</span><span class="nt">PubChemAssayOutcome</span> <span class="nn">vocab</span><span class="p">:</span><span class="nt">active</span><span class="p">.</span>
+      <span class="nv">?ENDPOINT</span> <span class="nn">obo</span><span class="p">:</span><span class="nt">IAO_0000136</span> <span class="nv">?SUBSTANCE</span><span class="p">.</span> <span class="c"># is about</span>
+      <span class="nv">?SUBSTANCE</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">CHEMINF_000477</span> <span class="nv">?PUBCHEM_COMPOUND</span><span class="p">.</span> <span class="c"># has normalized counterpart</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c"># select all mass spectra</span>
+  <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSVALUE</span><span class="p">.</span>
+
+  <span class="c"># compute similarities between the spectrum queries and the selected spectra</span>
+  <span class="k">BIND</span><span class="p">(</span><span class="nn">ms</span><span class="p">:</span><span class="nt">cosineGreedy</span><span class="p">(</span><span class="nv">?MSQUERY</span><span class="p">,</span> <span class="nv">?MSVALUE</span><span class="p">)</span> <span class="k">as</span> <span class="nv">?SCORE</span><span class="p">)</span>
+
+  <span class="c"># filter out results with similarity scores less than 0.85</span>
+  <span class="k">FILTER</span><span class="p">(</span><span class="nv">?SCORE</span> <span class="o">&gt;=</span> <span class="mf">0.85</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/chemweb/?query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20bao%3A%20%3Chttp%3A%2F%2Fwww.bioassayontology.org%2Fbao%23%3E%0APREFIX%20obo%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2F%3E%0APREFIX%20protein%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fprotein%2F%3E%0APREFIX%20vocab%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fvocabulary%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20ms%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fms%23%3E%0A%0A%23%20select%20spectra%20similar%20to%20spectra%20of%20compounds%20tested%20positive%20against%20a%20given%20target%0ASELECT%20DISTINCT%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%0A%7B%0A%20%20%23%20select%20spectra%20of%20compounds%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%7B%0A%20%20%20%20SELECT%20DISTINCT%20%3FMSQUERY%20WHERE%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%23%20select%20mass%20spectra%20of%20compounds%0A%20%20%20%20%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20input%0A%20%20%20%20%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20output%0A%20%20%20%20%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSQUERY.%20%23%20has%20value%0A%0A%20%20%20%20%20%20%23%20select%20pubchem%20equivalents%20of%20the%20compounds%0A%20%20%20%20%20%20%3FCOMPOUND%20skos%3AcloseMatch%20%3FPUBCHEM_COMPOUND.%20%23%20has%20value%0A%0A%20%20%20%20%20%20%23%20limit%20them%20to%20those%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%20%20%20%20%3FBIOASSAY%20bao%3ABAO_0000209%20%3FMEASUREGROUP.%20%23%20has%20measure%20group%0A%20%20%20%20%20%20%3FMEASUREGROUP%20obo%3ARO_0000057%20protein%3AACCQ9UPY5.%20%23%20has%20participant%0A%20%20%20%20%20%20%3FMEASUREGROUP%20obo%3AOBI_0000299%20%3FENDPOINT.%20%23%20has%20specified%20output%0A%20%20%20%20%20%20%3FENDPOINT%20vocab%3APubChemAssayOutcome%20vocab%3Aactive.%0A%20%20%20%20%20%20%3FENDPOINT%20obo%3AIAO_0000136%20%3FSUBSTANCE.%20%23%20is%20about%0A%20%20%20%20%20%20%3FSUBSTANCE%20sio%3ACHEMINF_000477%20%3FPUBCHEM_COMPOUND.%20%23%20has%20normalized%20counterpart%0A%20%20%20%20%7D%0A%20%20%7D%0A%0A%20%20%23%20select%20all%20mass%20spectra%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%0A%0A%20%20%23%20compute%20similarities%20between%20the%20spectrum%20queries%20and%20the%20selected%20spectra%0A%20%20BIND(ms%3AcosineGreedy(%3FMSQUERY%2C%20%3FMSVALUE)%20as%20%3FSCORE)%0A%0A%20%20%23%20filter%20out%20results%20with%20similarity%20scores%20less%20than%200.85%0A%20%20FILTER(%3FSCORE%20%3E%3D%200.85)%0A%7D">Run in ChemWeb</a>
+<a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/sparql#query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20bao%3A%20%3Chttp%3A%2F%2Fwww.bioassayontology.org%2Fbao%23%3E%0APREFIX%20obo%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2F%3E%0APREFIX%20protein%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fprotein%2F%3E%0APREFIX%20vocab%3A%20%3Chttp%3A%2F%2Frdf.ncbi.nlm.nih.gov%2Fpubchem%2Fvocabulary%23%3E%0APREFIX%20skos%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2004%2F02%2Fskos%2Fcore%23%3E%0APREFIX%20ms%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fms%23%3E%0A%0A%23%20select%20spectra%20similar%20to%20spectra%20of%20compounds%20tested%20positive%20against%20a%20given%20target%0ASELECT%20DISTINCT%20%3FSPECTRUM%20%3FMSVALUE%20WHERE%0A%7B%0A%20%20%23%20select%20spectra%20of%20compounds%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%7B%0A%20%20%20%20SELECT%20DISTINCT%20%3FMSQUERY%20WHERE%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%23%20select%20mass%20spectra%20of%20compounds%0A%20%20%20%20%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20input%0A%20%20%20%20%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20output%0A%20%20%20%20%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSQUERY.%20%23%20has%20value%0A%0A%20%20%20%20%20%20%23%20select%20pubchem%20equivalents%20of%20the%20compounds%0A%20%20%20%20%20%20%3FCOMPOUND%20skos%3AcloseMatch%20%3FPUBCHEM_COMPOUND.%20%23%20has%20value%0A%0A%20%20%20%20%20%20%23%20limit%20them%20to%20those%20that%20were%20tested%20positive%20against%20the%20target%0A%20%20%20%20%20%20%3FBIOASSAY%20bao%3ABAO_0000209%20%3FMEASUREGROUP.%20%23%20has%20measure%20group%0A%20%20%20%20%20%20%3FMEASUREGROUP%20obo%3ARO_0000057%20protein%3AACCQ9UPY5.%20%23%20has%20participant%0A%20%20%20%20%20%20%3FMEASUREGROUP%20obo%3AOBI_0000299%20%3FENDPOINT.%20%23%20has%20specified%20output%0A%20%20%20%20%20%20%3FENDPOINT%20vocab%3APubChemAssayOutcome%20vocab%3Aactive.%0A%20%20%20%20%20%20%3FENDPOINT%20obo%3AIAO_0000136%20%3FSUBSTANCE.%20%23%20is%20about%0A%20%20%20%20%20%20%3FSUBSTANCE%20sio%3ACHEMINF_000477%20%3FPUBCHEM_COMPOUND.%20%23%20has%20normalized%20counterpart%0A%20%20%20%20%7D%0A%20%20%7D%0A%0A%20%20%23%20select%20all%20mass%20spectra%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%0A%0A%20%20%23%20compute%20similarities%20between%20the%20spectrum%20queries%20and%20the%20selected%20spectra%0A%20%20BIND(ms%3AcosineGreedy(%3FMSQUERY%2C%20%3FMSVALUE)%20as%20%3FSCORE)%0A%0A%20%20%23%20filter%20out%20results%20with%20similarity%20scores%20less%20than%200.85%0A%20%20FILTER(%3FSCORE%20%3E%3D%200.85)%0A%7D&endpoint=https%3A%2F%2Fidsm.elixir-czech.cz%2Fsparql%2Fendpoint%2Fidsm&requestMethod=POST&tabTitle=IDSM%2FMS%20Example%20Query%204&headers=%7B%7D&contentTypeConstruct=application%2Fn-triples%2C*%2F*%3Bq%3D0.9&contentTypeSelect=application%2Fsparql-results%2Bjson%2C*%2F*%3Bq%3D0.9&outputFormat=table">Run in SPARQL GUI</a>
+
+
+<h3 id="q5">Query 5</h3>
+
+The example query selects mass spectra of compounds that occur in reactions that involve L-glutamate (CHEBI:29985).
+To select compounds based on their occurrence in reactions, the Rhea service is used.
+
+<div class="highlight"><pre><span></span><span class="k">PREFIX</span> <span class="nn">sio</span><span class="p">:</span> <span class="nl">&lt;http://semanticscience.org/resource/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">chebi</span><span class="p">:</span> <span class="nl">&lt;http://purl.obolibrary.org/obo/chebi/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">sachem</span><span class="p">:</span> <span class="nl">&lt;http://bioinfo.uochb.cas.cz/rdf/v1.0/sachem#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">rdfs</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/2000/01/rdf-schema#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">rdf</span><span class="p">:</span> <span class="nl">&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">rh</span><span class="p">:</span> <span class="nl">&lt;http://rdf.rhea-db.org/&gt;</span>
+<span class="k">PREFIX</span> <span class="nn">CHEBI</span><span class="p">:</span> <span class="nl">&lt;http://purl.obolibrary.org/obo/CHEBI_&gt;</span>
+
+<span class="c"># select mass spectra of compounds that occurre in reactions which involves CHEBI:29985</span>
+<span class="k">SELECT</span> <span class="nv">?COMPOUND</span> <span class="nv">?SPECTRUM</span> <span class="k">WHERE</span>
+<span class="p">{</span>
+  <span class="c"># use Rhea to select compounds occurring in reactions in which CHEBI:29985 occurs</span>
+  <span class="k">SERVICE</span> <span class="nl">&lt;https://sparql.rhea-db.org/sparql&gt;</span>
+  <span class="p">{</span>
+    <span class="k">SELECT</span> <span class="k">DISTINCT</span> <span class="nv">?CHEBI</span> <span class="k">WHERE</span>
+    <span class="p">{</span>
+      <span class="nv">?rhea</span> <span class="nn">rdfs</span><span class="p">:</span><span class="nt">subClassOf</span> <span class="nn">rh</span><span class="p">:</span><span class="nt">Reaction</span> <span class="p">.</span>
+      <span class="nv">?rhea</span> <span class="nn">rh</span><span class="p">:</span><span class="nt">side</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">contains</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">compound</span> <span class="nv">?compound</span> <span class="p">.</span>
+      <span class="nv">?rhea</span> <span class="nn">rh</span><span class="p">:</span><span class="nt">side</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">contains</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">compound</span> <span class="nv">?compound1</span> <span class="p">.</span>
+      <span class="nv">?compound</span> <span class="p">(</span><span class="nn">rh</span><span class="p">:</span><span class="nt">chebi</span><span class="err">|</span><span class="p">(</span><span class="nn">rh</span><span class="p">:</span><span class="nt">reactivePart</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">chebi</span><span class="p">)</span><span class="err">|</span><span class="p">(</span><span class="nn">rh</span><span class="p">:</span><span class="nt">underlyingChebi</span><span class="o">/</span><span class="nn">rh</span><span class="p">:</span><span class="nt">chebi</span><span class="p">))</span> <span class="nn">CHEBI</span><span class="p">:</span><span class="nt">29985</span><span class="p">.</span>
+      <span class="nv">?compound1</span> <span class="nn">rh</span><span class="p">:</span><span class="nt">chebi</span> <span class="nv">?CHEBI</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c"># select InChI descriptors of the ChEBI compounds found</span>
+  <span class="nv">?CHEBI</span> <span class="nn">chebi</span><span class="p">:</span><span class="nt">inchi</span> <span class="nv">?INCHI</span><span class="p">.</span>
+
+  <span class="c"># select all spectra and corresponding input compounds</span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000230</span> <span class="nv">?COMPOUND</span><span class="p">.</span> <span class="c"># has input </span>
+  <span class="nv">?EXPERIMENT</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000229</span> <span class="nv">?SPECTRUM</span><span class="p">.</span> <span class="c"># has output</span>
+  <span class="nv">?SPECTRUM</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?MSVALUE</span><span class="p">.</span> <span class="c"># has value</span>
+
+  <span class="c"># filter out compounds having the propper InChI descriptors</span>
+  <span class="nv">?COMPOUND</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000008</span> <span class="nv">?DESCRIPTOR</span><span class="p">.</span> <span class="c"># has attribute</span>
+  <span class="nv">?DESCRIPTOR</span> <span class="nn">rdf</span><span class="p">:</span><span class="nt">type</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">CHEMINF_000113</span><span class="p">.</span> <span class="c"># InChI descriptor</span>
+  <span class="nv">?DESCRIPTOR</span> <span class="nn">sio</span><span class="p">:</span><span class="nt">SIO_000300</span> <span class="nv">?INCHI</span><span class="p">.</span> <span class="c"># has value</span>
+<span class="p">}</span>
+</pre></div>
+
+          <a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/chemweb/?query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20chebi%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2Fchebi%2F%3E%0APREFIX%20sachem%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fsachem%23%3E%0APREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20rh%3A%20%3Chttp%3A%2F%2Frdf.rhea-db.org%2F%3E%0APREFIX%20CHEBI%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FCHEBI_%3E%0A%0A%23%20select%20mass%20spectra%20of%20compounds%20that%20occurre%20in%20reactions%20which%20involves%20CHEBI%3A29985%0ASELECT%20%3FCOMPOUND%20%3FSPECTRUM%20WHERE%0A%7B%0A%20%20%23%20use%20Rhea%20to%20select%20compounds%20occurring%20in%20reactions%20in%20which%20CHEBI%3A29985%20occurs%0A%20%20SERVICE%20%3Chttps%3A%2F%2Fsparql.rhea-db.org%2Fsparql%3E%0A%20%20%7B%0A%20%20%20%20SELECT%20DISTINCT%20%3FCHEBI%20WHERE%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%3Frhea%20rdfs%3AsubClassOf%20rh%3AReaction%20.%0A%20%20%20%20%20%20%3Frhea%20rh%3Aside%2Frh%3Acontains%2Frh%3Acompound%20%3Fcompound%20.%0A%20%20%20%20%20%20%3Frhea%20rh%3Aside%2Frh%3Acontains%2Frh%3Acompound%20%3Fcompound1%20.%0A%20%20%20%20%20%20%3Fcompound%20(rh%3Achebi%7C(rh%3AreactivePart%2Frh%3Achebi)%7C(rh%3AunderlyingChebi%2Frh%3Achebi))%20CHEBI%3A29985.%0A%20%20%20%20%20%20%3Fcompound1%20rh%3Achebi%20%3FCHEBI%0A%20%20%20%20%7D%0A%20%20%7D%0A%0A%20%20%23%20select%20InChI%20descriptors%20of%20the%20ChEBI%20compounds%20found%0A%20%20%3FCHEBI%20chebi%3Ainchi%20%3FINCHI.%0A%0A%20%20%23%20select%20all%20spectra%20and%20corresponding%20input%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%0A%20%20%23%20filter%20out%20compounds%20having%20the%20propper%20InChI%20descriptors%0A%20%20%3FCOMPOUND%20sio%3ASIO_000008%20%3FDESCRIPTOR.%20%23%20has%20attribute%0A%20%20%3FDESCRIPTOR%20rdf%3Atype%20sio%3ACHEMINF_000113.%20%23%20InChI%20descriptor%0A%20%20%3FDESCRIPTOR%20sio%3ASIO_000300%20%3FINCHI.%20%23%20has%20value%0A%7D">Run in ChemWeb</a>
+          <a role="button" class="btn btn-outline-primary" target="_blank" href="https://idsm.elixir-czech.cz/sparql#query=PREFIX%20sio%3A%20%3Chttp%3A%2F%2Fsemanticscience.org%2Fresource%2F%3E%0APREFIX%20chebi%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2Fchebi%2F%3E%0APREFIX%20sachem%3A%20%3Chttp%3A%2F%2Fbioinfo.uochb.cas.cz%2Frdf%2Fv1.0%2Fsachem%23%3E%0APREFIX%20rdfs%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F2000%2F01%2Frdf-schema%23%3E%0APREFIX%20rdf%3A%20%3Chttp%3A%2F%2Fwww.w3.org%2F1999%2F02%2F22-rdf-syntax-ns%23%3E%0APREFIX%20rh%3A%20%3Chttp%3A%2F%2Frdf.rhea-db.org%2F%3E%0APREFIX%20CHEBI%3A%20%3Chttp%3A%2F%2Fpurl.obolibrary.org%2Fobo%2FCHEBI_%3E%0A%0A%23%20select%20mass%20spectra%20of%20compounds%20that%20occurre%20in%20reactions%20which%20involves%20CHEBI%3A29985%0ASELECT%20%3FCOMPOUND%20%3FSPECTRUM%20WHERE%0A%7B%0A%20%20%23%20use%20Rhea%20to%20select%20compounds%20occurring%20in%20reactions%20in%20which%20CHEBI%3A29985%20occurs%0A%20%20SERVICE%20%3Chttps%3A%2F%2Fsparql.rhea-db.org%2Fsparql%3E%0A%20%20%7B%0A%20%20%20%20SELECT%20DISTINCT%20%3FCHEBI%20WHERE%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%3Frhea%20rdfs%3AsubClassOf%20rh%3AReaction%20.%0A%20%20%20%20%20%20%3Frhea%20rh%3Aside%2Frh%3Acontains%2Frh%3Acompound%20%3Fcompound%20.%0A%20%20%20%20%20%20%3Frhea%20rh%3Aside%2Frh%3Acontains%2Frh%3Acompound%20%3Fcompound1%20.%0A%20%20%20%20%20%20%3Fcompound%20(rh%3Achebi%7C(rh%3AreactivePart%2Frh%3Achebi)%7C(rh%3AunderlyingChebi%2Frh%3Achebi))%20CHEBI%3A29985.%0A%20%20%20%20%20%20%3Fcompound1%20rh%3Achebi%20%3FCHEBI%0A%20%20%20%20%7D%0A%20%20%7D%0A%0A%20%20%23%20select%20InChI%20descriptors%20of%20the%20ChEBI%20compounds%20found%0A%20%20%3FCHEBI%20chebi%3Ainchi%20%3FINCHI.%0A%0A%20%20%23%20select%20all%20spectra%20and%20corresponding%20input%20compounds%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000230%20%3FCOMPOUND.%20%23%20has%20input%20%0A%20%20%3FEXPERIMENT%20sio%3ASIO_000229%20%3FSPECTRUM.%20%23%20has%20output%0A%20%20%3FSPECTRUM%20sio%3ASIO_000300%20%3FMSVALUE.%20%23%20has%20value%0A%0A%20%20%23%20filter%20out%20compounds%20having%20the%20propper%20InChI%20descriptors%0A%20%20%3FCOMPOUND%20sio%3ASIO_000008%20%3FDESCRIPTOR.%20%23%20has%20attribute%0A%20%20%3FDESCRIPTOR%20rdf%3Atype%20sio%3ACHEMINF_000113.%20%23%20InChI%20descriptor%0A%20%20%3FDESCRIPTOR%20sio%3ASIO_000300%20%3FINCHI.%20%23%20has%20value%0A%7D&endpoint=https%3A%2F%2Fidsm.elixir-czech.cz%2Fsparql%2Fendpoint%2Fidsm&requestMethod=POST&tabTitle=IDSM%2FMS%20Example%20Query%205&headers=%7B%7D&contentTypeConstruct=application%2Fn-triples%2C*%2F*%3Bq%3D0.9&contentTypeSelect=application%2Fsparql-results%2Bjson%2C*%2F*%3Bq%3D0.9&outputFormat=table">Run in SPARQL GUI</a>
+
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
