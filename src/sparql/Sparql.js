@@ -1,15 +1,13 @@
 import React from "react";
 import { Container, Row, Col, Accordion, Card, Button } from "react-bootstrap";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-import { faBook, faInfoCircle, faServer, faPlay, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faServer, faPlay, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { useAccordionButton } from 'react-bootstrap/AccordionButton';
 
 import { trackPageView } from "../matomo.js"
 
 import Yasgui from "./Yasgui"
-import Statistics from "./Statistics"
 import Status from "./Status"
-import { servletBase } from "../config";
 import { endpoints, defaultEndpoint, defaultQuery } from "./config";
 import { demoQueries } from "./demos";
 
@@ -63,21 +61,6 @@ function Sparql() {
                   <li><a target="_blank" rel="noreferrer" href="https://pubchem.ncbi.nlm.nih.gov/docs/rdf">PubChemRDF description</a></li>
                 </ul>
                   
-                </Card.Body>
-              </Accordion.Collapse>
-            </Card>
-          </Accordion>
-
-          <Accordion>
-            <Card>
-              <Card.Header>
-                <CustomToggle variant="outline-success" block eventKey="0">
-                  <Icon icon={faInfoCircle}/> Database status
-                </CustomToggle>
-              </Card.Header>
-              <Accordion.Collapse eventKey="0">
-                <Card.Body className="mt-2">
-                  <Statistics url={servletBase + "/endpoint/statistics.json"}/>
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
