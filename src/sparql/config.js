@@ -36,11 +36,6 @@ const checkQuery = idn`${0}
 
 
 const endpoints = [{
-    name: "neXtProt",
-    endpoint: "https://sparql.nextprot.org/",
-    query: checkQuery
-  },
-  {
     name: "UniProt",
     endpoint: "https://sparql.uniprot.org",
     query: checkQuery
@@ -48,7 +43,27 @@ const endpoints = [{
   {
     name: "Rhea",
     endpoint: "https://sparql.rhea-db.org/sparql",
+    query: simpleCheckQuery
+  },
+  {
+    name: "GlyCosmos",
+    endpoint: "https://ts.glycosmos.org/sparql",
+    query: simpleCheckQuery
+  },
+  {
+    name: "WikiPathways",
+    endpoint: "https://sparql.wikipathways.org/sparql",
     query: checkQuery
+  },
+  {
+    name: "Wikidata",
+    endpoint: "https://query.wikidata.org/sparql",
+    query: simpleCheckQuery
+  },
+  {
+    name: "Identifiers.org",
+    endpoint: "https://sparql.api.identifiers.org/sparql",
+    query: simpleCheckQuery
   },
   {
     name: "IDSM",
