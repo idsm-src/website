@@ -36,7 +36,7 @@ function ResultsPage() {
   var { mol, params } = parseHash(useParams()["hash"]);
 
   if(mol == null)
-    return <Navigate to="/search"/>;
+    return <Navigate to="/sachem/search" replace/>;
 
   return <Results query={mol} params={params}/>;
 }
