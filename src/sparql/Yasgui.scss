@@ -11,10 +11,10 @@ $endpoint-gap: 3px;
 $box-border-color: #d1d1d1;
 $cell-border-color: #d9d9d9;
 $column-border-color: $gray-200;
-// the blue of the editor used before, which underlined the selected tab, and its lighter variant for a hovered tab
+// the blue of the editor used before, which underlined the selected tab, and its lighter variant for a hovered tab;
+// the buttons have the blue of the buttons of the rest of the page
 $editor-blue: #337ab7;
 $editor-blue-light: #9fc4e4;
-$editor-blue-dark: shade-color($editor-blue, $link-shade-percentage);
 // the buttons of the editor, whose icons are equally wide: the line icons take about 0.85 of their font size, the play
 // icon about 0.9 of its height and its outline
 $editor-button-size: 36px;
@@ -24,7 +24,8 @@ $run-icon-size: 26px;
 
 /*
  * The component comes in the colours of Ontotext and with fonts of its own. These rules give it the colours of the
- * editor used before and the font of the rest of the page; the ID outweighs the selectors of the component styles.
+ * editor used before, the buttons and the font of the rest of the page; the ID outweighs the selectors of the component
+ * styles.
  */
 #root ontotext-yasgui {
 
@@ -35,18 +36,19 @@ $run-icon-size: 26px;
 
   .ontotext-dropdown-button, .ontotext-dropdown-menu-item, .yasqe-footer-buttons .abort-button,
       .editable-text-field-wrapper .save-btn, .pivot-table-download-as-button, .chart-download-as-button {
-    background-color: $editor-blue;
+    background-color: $primary;
   }
 
   .ontotext-dropdown-button {
     padding: $btn-padding-y $btn-padding-x;
     border: $btn-border-width solid transparent;
+    border-radius: $btn-border-radius;
     font-size: $btn-font-size;
     line-height: $btn-line-height;
   }
 
   .ontotext-dropdown-menu-item:hover, .editable-text-field-wrapper .save-btn:hover {
-    background-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
+    background-color: shade-color($primary, $btn-hover-bg-shade-amount);
   }
 
   // the run button is the play icon at the top of the editor, as in the editor used before, with the other buttons
@@ -104,15 +106,15 @@ $run-icon-size: 26px;
         }
 
         path:not(.loadingIcon) {
-          fill: tint-color($editor-blue, 90%);
-          stroke: $editor-blue;
+          fill: tint-color($primary, 90%);
+          stroke: $primary;
           stroke-width: 2px;
           vector-effect: non-scaling-stroke;
         }
       }
 
       &:hover .queryIcon path:not(.loadingIcon) {
-        stroke: $editor-blue-dark;
+        stroke: $link-hover-color;
       }
 
       .warningIcon {
@@ -133,7 +135,7 @@ $run-icon-size: 26px;
       }
 
       &.busy .loadingIcon {
-        stroke: $editor-blue;
+        stroke: $primary;
         stroke-width: 8px;
         stroke-dasharray: 100;
         animation: idsm-query-busy 1.5s linear infinite;
@@ -146,9 +148,13 @@ $run-icon-size: 26px;
     position: relative;
   }
 
+  // the menu is set off the rounded button as a dropdown of Bootstrap
   .ontotext-dropdown-menu {
     right: 0;
     min-width: 100%;
+    margin-top: $dropdown-spacer;
+    border-radius: $dropdown-border-radius;
+    overflow: hidden;
   }
 
   // the bar with the views of the results scrolls horizontally, which would clip the menu below the bar; with the
@@ -158,22 +164,22 @@ $run-icon-size: 26px;
   }
 
   .copy-link-dialog .primary-button {
-    background-color: $editor-blue;
-    border-color: $editor-blue;
+    background-color: $primary;
+    border-color: $primary;
 
     &:hover, &:focus {
-      background-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
-      border-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
+      background-color: shade-color($primary, $btn-hover-bg-shade-amount);
+      border-color: shade-color($primary, $btn-hover-bg-shade-amount);
     }
   }
 
   // the lines of the icons are a little thinner, as a stroke in the colour of the background narrows them
   .yasqe_buttons .custom-button, .yasr .yasr-fullscreen-button {
-    color: $editor-blue;
+    color: $primary;
     -webkit-text-stroke: .5px $white;
 
     &:hover {
-      color: $editor-blue-dark;
+      color: $link-hover-color;
     }
   }
 
@@ -240,7 +246,7 @@ $run-icon-size: 26px;
   .tabsList .addTab {
     margin-left: 15px;
     padding: 0 5px 2px;
-    color: $editor-blue;
+    color: $primary;
 
     i::before {
       content: "+";
@@ -248,7 +254,7 @@ $run-icon-size: 26px;
     }
 
     &:hover {
-      color: $editor-blue;
+      color: $primary;
       transform: scale(1.1);
 
       i {
