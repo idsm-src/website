@@ -5,6 +5,12 @@
     height: 600px;
   }
 
+  // the selected search type has the blue of the other buttons, not the darker one of a pressed button
+  .btn-check + .btn-primary {
+    --bs-btn-active-bg: var(--bs-primary);
+    --bs-btn-active-border-color: var(--bs-primary);
+  }
+
   // input range
   .input-range {
     .input-range__label--min, .input-range__label--max {
