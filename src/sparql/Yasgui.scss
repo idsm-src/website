@@ -163,16 +163,6 @@ $run-icon-size: 26px;
     overflow: visible;
   }
 
-  .copy-link-dialog .primary-button {
-    background-color: $primary;
-    border-color: $primary;
-
-    &:hover, &:focus {
-      background-color: shade-color($primary, $btn-hover-bg-shade-amount);
-      border-color: shade-color($primary, $btn-hover-bg-shade-amount);
-    }
-  }
-
   // the lines of the icons are a little thinner, as a stroke in the colour of the background narrows them
   .yasqe_buttons .custom-button, .yasr .yasr-fullscreen-button {
     color: $primary;
@@ -371,6 +361,59 @@ $run-icon-size: 26px;
   // the label of the download button inherits the icon font of remixicon, and the dialogs ask for Roboto
   .keyboard-shortcuts-dialog-button, .ontotext-dropdown-button .button-name, .dialog-overlay, .dialog {
     font-family: $font-family-base;
+  }
+}
+
+
+// the confirmation of closing a tab is appended to the body, outside the editor
+body > confirmation-dialog {
+  .dialog-overlay, .dialog {
+    font-family: $font-family-base;
+  }
+}
+
+
+// the dialogs have the orange and square buttons of Ontotext, so they get the buttons of Bootstrap, the secondary one
+// for cancelling; the confirmation of closing a tab focuses its cancel button, which looks hovered only when focused
+// from the keyboard, as in Bootstrap
+ontotext-dialog-web-component, confirmation-dialog {
+  .dialog .dialog-footer {
+    button {
+      padding: $btn-padding-y $btn-padding-x;
+      border-radius: $btn-border-radius;
+      font-size: $btn-font-size;
+      line-height: $btn-line-height;
+
+      &:focus-visible {
+        box-shadow: $btn-focus-box-shadow;
+      }
+    }
+
+    .confirm-button, .primary-button {
+      &, &:focus {
+        background-color: $primary;
+        border-color: $primary;
+        color: $white;
+      }
+
+      &:hover, &:focus-visible {
+        background-color: shade-color($primary, $btn-hover-bg-shade-amount);
+        border-color: shade-color($primary, $btn-hover-border-shade-amount);
+      }
+    }
+
+    .cancel-button {
+      &, &:focus {
+        background-color: $secondary;
+        border-color: $secondary;
+        color: $white;
+      }
+
+      &:hover, &:focus-visible {
+        background-color: shade-color($secondary, $btn-hover-bg-shade-amount);
+        border-color: shade-color($secondary, $btn-hover-border-shade-amount);
+      }
+    }
   }
 }
 
