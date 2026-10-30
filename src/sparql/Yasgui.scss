@@ -1,53 +1,454 @@
-#root .yasgui {
-  line-height: initial;
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
 
-  input[type="checkbox"] {
-    margin: revert;
-    opacity: revert;
-    position: revert;
+
+// Yasgui limits the control bar with the endpoint field to the height of the tabs, and its menu of settings is placed
+// below the bar by this height
+$control-bar-height: 35px;
+// the gap between the endpoint field and the editor
+$endpoint-gap: 3px;
+// the lines around the boxes and between the cells of the table are as dark as in the editor used before
+$box-border-color: #d1d1d1;
+$cell-border-color: #d9d9d9;
+$column-border-color: $gray-200;
+// the blue of the editor used before, which underlined the selected tab, and its lighter variant for a hovered tab
+$editor-blue: #337ab7;
+$editor-blue-light: #9fc4e4;
+$editor-blue-dark: shade-color($editor-blue, $link-shade-percentage);
+// the buttons of the editor, whose icons are equally wide: the line icons take about 0.85 of their font size, the play
+// icon about 0.9 of its height and its outline
+$editor-button-size: 36px;
+$editor-icon-size: 31px;
+$run-icon-size: 26px;
+
+
+/*
+ * The component comes in the colours of Ontotext and with fonts of its own. These rules give it the colours of the
+ * editor used before and the font of the rest of the page; the ID outweighs the selectors of the component styles.
+ */
+#root ontotext-yasgui {
+
+  // the menu of the run button offers only the explain plans of GraphDB
+  query-split-button {
+    display: none;
   }
 
-  svg {
-    vertical-align: revert;
+  .ontotext-dropdown-button, .ontotext-dropdown-menu-item, .yasqe-footer-buttons .abort-button,
+      .editable-text-field-wrapper .save-btn, .pivot-table-download-as-button, .chart-download-as-button {
+    background-color: $editor-blue;
   }
 
-  label {
-    margin-bottom: revert;
+  .ontotext-dropdown-button {
+    padding: $btn-padding-y $btn-padding-x;
+    border: $btn-border-width solid transparent;
+    font-size: $btn-font-size;
+    line-height: $btn-line-height;
   }
 
-  select {
-    -webkit-appearance: none;
-    appearance: none;
-    background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxOHB4JyBoZWlnaHQ9JzE4cHgnPjxwb2x5bGluZSBwb2ludHM9JzMsNiAxNSw2IDksMTQnLz48L3N2Zz4K) right no-repeat;
-    background-position: right 3px center;
-    background-size: 18px 18px;
+  .ontotext-dropdown-menu-item:hover, .editable-text-field-wrapper .save-btn:hover {
+    background-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
   }
 
-  input, select {
-    border: 1px solid #d1d1d1;
-    background-color: white;
-    padding: 2px 3px;
-  }
+  // the run button is the play icon at the top of the editor, as in the editor used before, with the other buttons
+  // below it and in their colours; its second outline runs around it during a query, and an invalid query gets a
+  // warning
+  .yasqe_buttons {
+    align-items: flex-end;
+    gap: 2px;
 
-  input:focus, select:focus {
-    outline-color: #7fbcff !important;
-    outline-offset: -1px !important;
-    outline-style: solid !important;
-    outline-width: 1px !important;
-  }
-
-  .controlbar {
-    button {
-      padding: 0px 0px 0px 10px;
+    // the run button and the other buttons come in different groups, which are dissolved into one column
+    .yasqe_buttons-top, .yasqe_buttons-bottom {
+      display: contents;
     }
-  
-    .autocomplete {
-      border: 1px solid #ccc !important;
-      padding: 3px 6px;
+
+    .yasqe_tooltip_queryButton {
+      order: -1;
+    }
+
+    .custom-button {
+      width: $editor-button-size;
+      height: $editor-button-size;
+      margin: 0;
+      padding: 0;
+      font-size: $editor-icon-size;
+    }
+
+    .keyboard-shortcuts-dialog-button {
+      margin-top: auto;
+    }
+
+    .yasqe_queryButton {
+      position: relative;
+      width: $editor-button-size;
+      height: $editor-button-size;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+
+      svg {
+        display: block;
+      }
+
+      .queryIcon {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+          width: $run-icon-size;
+          height: $run-icon-size;
+          overflow: visible;
+        }
+
+        path:not(.loadingIcon) {
+          fill: tint-color($editor-blue, 90%);
+          stroke: $editor-blue;
+          stroke-width: 2px;
+          vector-effect: non-scaling-stroke;
+        }
+      }
+
+      &:hover .queryIcon path:not(.loadingIcon) {
+        stroke: $editor-blue-dark;
+      }
+
+      .warningIcon {
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        svg {
+          width: 12px;
+          height: 12px;
+          fill: $danger;
+        }
+      }
+
+      &.query_error .warningIcon {
+        display: block;
+      }
+
+      &.busy .loadingIcon {
+        stroke: $editor-blue;
+        stroke-width: 8px;
+        stroke-dasharray: 100;
+        animation: idsm-query-busy 1.5s linear infinite;
+      }
     }
   }
 
-  .dataTables_wrapper {
-    margin-top: 5px;
+  // the menu of the download button is wider than the button, and from its left edge it would reach past the page
+  .ontotext-dropdown {
+    position: relative;
+  }
+
+  .ontotext-dropdown-menu {
+    right: 0;
+    min-width: 100%;
+  }
+
+  // the bar with the views of the results scrolls horizontally, which would clip the menu below the bar; with the
+  // pivot table, the charts and the map disabled its items fit
+  .yasr .yasr_btnGroup {
+    overflow: visible;
+  }
+
+  .copy-link-dialog .primary-button {
+    background-color: $editor-blue;
+    border-color: $editor-blue;
+
+    &:hover, &:focus {
+      background-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
+      border-color: shade-color($editor-blue, $btn-hover-bg-shade-amount);
+    }
+  }
+
+  // the lines of the icons are a little thinner, as a stroke in the colour of the background narrows them
+  .yasqe_buttons .custom-button, .yasr .yasr-fullscreen-button {
+    color: $editor-blue;
+    -webkit-text-stroke: .5px $white;
+
+    &:hover {
+      color: $editor-blue-dark;
+    }
+  }
+
+  // the fullscreen button of the results looks as the one of the editor; the bold weight would thicken the icon, and
+  // the larger icon is lowered to the middle of the labels of the views
+  .yasr .yasr-fullscreen-button {
+    position: relative;
+    top: 6px;
+    font-size: $editor-icon-size;
+    font-weight: normal;
+  }
+
+  // the tabs look as in the editor used before: underlined labels without boxes and a plain plus that adds a tab
+  .tabsList .tab {
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+    min-height: 35px;
+    margin: 0;
+    padding: 0 24px 0 30px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background-color: transparent;
+    color: $gray-600;
+    font-size: 15px;
+    font-weight: 500;
+
+    &:hover {
+      border-bottom-color: $editor-blue-light;
+      color: $gray-700;
+    }
+
+    &.active {
+      border-bottom-color: $editor-blue;
+      color: $gray-700;
+    }
+
+    .closeTab {
+      margin-left: 7px;
+      line-height: 1;
+      color: $black;
+      opacity: .2;
+
+      &:hover {
+        color: $black;
+        opacity: .5;
+      }
+    }
+
+    &.active .loader {
+      background-color: $editor-blue-light;
+    }
+
+    &:hover .loader {
+      background-color: $editor-blue;
+    }
+  }
+
+  .tabsList .create-tab-tab {
+    margin: 0;
+    background-color: transparent;
+  }
+
+  .tabsList .addTab {
+    margin-left: 15px;
+    padding: 0 5px 2px;
+    color: $editor-blue;
+
+    i::before {
+      content: "+";
+      font-family: $font-family-base;
+    }
+
+    &:hover {
+      color: $editor-blue;
+      transform: scale(1.1);
+
+      i {
+        transform: none;
+      }
+    }
+  }
+
+  // the settings button takes a square at the start of the control bar, as in the editor used before
+  .controlbar .tabContextButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $control-bar-height;
+    height: $control-bar-height;
+    padding: 0;
+
+    // the icon sits on a line of text as an inline image, which puts it below the middle of the bar
+    svg {
+      display: block;
+    }
+  }
+
+  // the endpoint field has a heavier border than the other fields, and with its margins it is higher than the control
+  // bar, so it reaches into the editor; it is lowered to keep a small gap above the editor
+  .controlbar .autocompleteWrapper {
+    margin-left: 0;
+  }
+
+  .controlbar .autocomplete {
+    margin: 2px 0 $endpoint-gap;
+    padding: 2px 6px;
+    border: $input-border-width solid $box-border-color;
+
+    &:focus {
+      border-color: tint-color($editor-blue, 50%);
+    }
+  }
+
+  // the list of endpoints is moved up by the bottom margin of the field
+  .controlbar .autocompleteList {
+    margin-top: -$endpoint-gap;
+  }
+
+  // the loader shows the animated logo of Ontotext, so a spinner of Bootstrap takes its place
+  .ontotext-yasgui-loader .loader-component > div:first-child {
+    svg {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: $spinner-width;
+      height: $spinner-height;
+      margin: $spacer 0 $spacer * .5;
+      border: $spinner-border-width solid $editor-blue;
+      border-right-color: transparent;
+      border-radius: 50%;
+      // the keyframes come with the styles of Bootstrap
+      animation: $spinner-animation-speed linear infinite spinner-border;
+    }
+  }
+
+  .yasr .yasr_header, .yasr .yasr_header .yasr_response_chip {
+    background-color: $gray-200;
+  }
+
+  .yasr table.dataTable thead th {
+    background-color: $gray-100;
+  }
+
+  .CodeMirror, .tableFilter {
+    border-color: $box-border-color;
+  }
+
+  // every cell draws only its right and bottom lines and the table the top and left ones, as the lines of neighbouring
+  // cells would double; the lines between the columns are lighter, the editor used before had none
+  .yasr table.dataTable {
+    border: solid $cell-border-color;
+    border-width: 1px 0 0 1px;
+
+    th, td {
+      border: solid $cell-border-color;
+      border-width: 0 1px 1px 0;
+      border-right-color: $column-border-color;
+    }
+
+    th:last-child, td:last-child {
+      border-right-color: $cell-border-color;
+    }
+  }
+
+  // the results show their notices, such as the one about no results yet, as success alerts, which Bootstrap colours
+  // green
+  .yasr .alert-box.alert-success {
+    --bs-alert-color: var(--bs-secondary-text-emphasis);
+    --bs-alert-bg: var(--bs-secondary-bg-subtle);
+    --bs-alert-border-color: var(--bs-secondary-border-subtle);
+  }
+
+  // the check boxes of the table follow their labels, as the markup is meant for toggle switches, so they are moved
+  // in front of them and spaced as in Bootstrap
+  .tableControls .switch {
+    gap: $form-check-padding-start - $form-check-input-width;
+    margin-right: $form-check-inline-margin-end;
+
+    input {
+      order: -1;
+      margin: 0;
+    }
+  }
+
+  // the label of the download button inherits the icon font of remixicon, and the dialogs ask for Roboto
+  .keyboard-shortcuts-dialog-button, .ontotext-dropdown-button .button-name, .dialog-overlay, .dialog {
+    font-family: $font-family-base;
+  }
+}
+
+
+// the autocompletion hints are appended to the body
+.CodeMirror-hints .CodeMirror-hint b {
+  color: $editor-blue;
+}
+
+
+// the images and charts of a cell sit beside its term, which is a single flex item, so that the spaces between the
+// parts of the term stay
+#root ontotext-yasgui .idsm-cell {
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+  hyphens: auto;
+
+  .literal-value {
+    white-space: pre-wrap;
+  }
+
+  .ms-chart {
+    border: none;
+    pointer-events: none;
+    vertical-align: middle;
+    margin-right: 15px;
+  }
+
+  .zoomable {
+    width: 100px;
+    height: 100px;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 0.5em;
+  }
+}
+
+
+// the enlarged image of a compound is shown above the page (see Yasgui.js), as the table clips its cells
+.idsm-zoom {
+  position: fixed;
+  z-index: $zindex-tooltip;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 1px solid $box-border-color;
+  background-color: $white;
+  animation: idsm-zoom .2s;
+}
+
+
+@keyframes idsm-zoom {
+  from {
+    transform: translate(-50%, -50%) scale(.5);
+  }
+}
+
+
+// the compact view of the component shortens only the cells of its own renderer
+#root ontotext-yasgui .extendedTableEllipseTable .idsm-cell {
+  word-break: normal;
+
+  .idsm-term {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .literal-value {
+    white-space: nowrap;
+  }
+
+  // the images of compounds and the charts of spectra would keep the rows high
+  .zoomable, .ms-chart {
+    display: none;
+  }
+}
+
+
+@keyframes idsm-query-busy {
+  to {
+    stroke-dashoffset: 200;
   }
 }
