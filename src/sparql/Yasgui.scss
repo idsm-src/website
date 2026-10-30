@@ -20,6 +20,30 @@ $editor-blue-light: #9fc4e4;
 $editor-button-size: 36px;
 $editor-icon-size: 31px;
 $run-icon-size: 26px;
+// the icons of remixicon on the fullscreen and link buttons, drawn with thinner lines by thin-icon
+$thin-icons: (
+  "fullscreen-line": "M8 3V5H4V9H2V3H8ZM2 21V15H4V19H8V21H2ZM22 21H16V19H20V15H22V21ZM22 9H20V5H16V3H22V9Z",
+  "fullscreen-exit-line": "M18 7H22V9H16V3H18V7ZM8 9H2V7H6V3H8V9ZM18 17V21H16V15H22V17H18ZM8 15V21H6V17H2V15H8Z",
+  "links-line": "M13.0607 8.11097L14.4749 9.52518C17.2086 12.2589 17.2086 16.691 14.4749 19.4247L14.1214 19.7782"
+    + "C11.3877 22.5119 6.95555 22.5119 4.22188 19.7782C1.48821 17.0446 1.48821 12.6124 4.22188 9.87874"
+    + "L5.6361 11.293C3.68348 13.2456 3.68348 16.4114 5.6361 18.364"
+    + "C7.58872 20.3166 10.7545 20.3166 12.7072 18.364L13.0607 18.0105"
+    + "C15.0133 16.0578 15.0133 12.892 13.0607 10.9394L11.6465 9.52518L13.0607 8.11097ZM19.7782 14.1214"
+    + "L18.364 12.7072C20.3166 10.7545 20.3166 7.58872 18.364 5.6361"
+    + "C16.4114 3.68348 13.2456 3.68348 11.293 5.6361L10.9394 5.98965"
+    + "C8.98678 7.94227 8.98678 11.1081 10.9394 13.0607L12.3536 14.4749L10.9394 15.8891L9.52518 14.4749"
+    + "C6.79151 11.7413 6.79151 7.30911 9.52518 4.57544L9.87874 4.22188"
+    + "C12.6124 1.48821 17.0446 1.48821 19.7782 4.22188C22.5119 6.95555 22.5119 11.3877 19.7782 14.1214Z",
+);
+
+
+// a mask in the shape of an icon of remixicon, given by the path of its glyph, whose lines are a little thinner: the
+// black outline of the glyph in the inner mask cuts .2 of the 24 units of the icon off each side of the lines
+@function thin-icon($path) {
+  $svg: "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cmask id='m'%3E%3Cpath d='#{$path}' "
+    + "fill='white' stroke='black' stroke-width='.4'/%3E%3C/mask%3E%3Cpath d='#{$path}' mask='url(%23m)'/%3E%3C/svg%3E";
+  @return url("data:image/svg+xml,#{$svg}");
+}
 
 
 /*
@@ -163,13 +187,32 @@ $run-icon-size: 26px;
     overflow: visible;
   }
 
-  // the lines of the icons are a little thinner, as a stroke in the colour of the background narrows them
+  // the buttons of the editor are transparent as the run button, so a selection in the editor shows around their icons
+  .yasqe_buttons .custom-button {
+    background-color: transparent;
+  }
+
   .yasqe_buttons .custom-button, .yasr .yasr-fullscreen-button {
     color: $primary;
-    -webkit-text-stroke: .5px $white;
 
     &:hover {
       color: $link-hover-color;
+    }
+  }
+
+  // the lines of the icons are a little thinner: the glyphs give way to the masks of thin-icon in their place, which
+  // keep the buttons transparent around the lines
+  .yasqe_buttons, .yasr .yasr-fullscreen-button {
+    @each $name, $path in $thin-icons {
+      .ri-#{$name}::before {
+        content: "";
+        display: inline-block;
+        width: 1em;
+        height: 1em;
+        vertical-align: -.125em;
+        background-color: currentColor;
+        mask: thin-icon($path) center / contain no-repeat;
+      }
     }
   }
 
