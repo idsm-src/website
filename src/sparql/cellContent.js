@@ -209,4 +209,4 @@ function getCellContent(binding, prefixes) {
 }
 
 
-export { getCellContent };
+export { escape, getCellContent };

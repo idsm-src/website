@@ -1,7 +1,7 @@
 import React from "react";
 import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
 
-import { getCellContent } from "./cellContent";
+import { escape, getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
 import { endpointBase } from "../config";
 
@@ -99,18 +99,24 @@ function configureYasgui(endpoints) {
 
   Yasqe.defaults.autocompleters = Yasqe.defaults.autocompleters.filter(name => name !== "property" && name !== "class");
 
+  // the suggestions take the form of those of GraphDB, as only an IRI of that form is inserted in angle brackets or
+  // with the prefix typed; the hints show what they insert, as HTML
+  const getSuggestions = (iris, token) => iris.filter(iri => iri.startsWith(token.autocompletionString))
+    .map(iri => ({ type: "uri", value: iri, description: iri }));
+  const showInsertedText = (yasqe, hints) => hints.map(hint => ({ ...hint, displayText: escape(hint.text) }));
+
   Yasqe.forkAutocompleter("property", {
     name: "property-local",
     persistenceId: null,
-    get: (yasqe, token) => info.then(data => data.properties.filter(iri => iri.startsWith(token.autocompletionString)))
-      .catch(() => [])
+    get: (yasqe, token) => info.then(data => getSuggestions(data.properties, token)).catch(() => []),
+    postprocessHints: showInsertedText
   });
 
   Yasqe.forkAutocompleter("class", {
     name: "class-local",
     persistenceId: null,
-    get: (yasqe, token) => info.then(data => data.classes.filter(iri => iri.startsWith(token.autocompletionString)))
-      .catch(() => [])
+    get: (yasqe, token) => info.then(data => getSuggestions(data.classes, token)).catch(() => []),
+    postprocessHints: showInsertedText
   });
 
   // the run button shows the icons of the editor used before (see Yasgui.scss); it sets its label at each update, so
