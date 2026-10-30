@@ -43,7 +43,7 @@ function RangeOption(props) {
     <Form.Group as={Row} className="mt-1">
       <Form.Label column xs={12} sm={4}>{props.label}</Form.Label>
       <Col xs={12} sm={8}>
-      <div style={{"margin-top":"0.8rem"}}>
+      <div style={{marginTop: "0.8rem"}}>
         <InputRange maxValue={props.maxValue} minValue={props.minValue} step={props.step}
             value={props.value} onChange={v => props.onChange(v)}
             formatLabel={(value) =>`${Math.round((value + Number.EPSILON) * props.scale) / props.scale}`}/>
@@ -86,9 +86,15 @@ function Search(props) {
 
   const [state, setState] = React.useState(props.defaultParams);
 
+  // Ketcher initialises its API again whenever it gets another provider of the structure service
+  const [structServiceProvider] = React.useState(() => new StandaloneStructServiceProvider());
+
   function assignState(value) {
     setState(state => ({...state, ...value }));
   }
+
+  // every page gets an editor of its own, so the editor of a page left before must not take the molecule
+  React.useEffect(() => () => { window.ketcher = undefined; }, []);
 
   React.useEffect(() => {
     setTimeout(function waitOnKetcher() {
@@ -108,7 +114,7 @@ function Search(props) {
 
       <Row className="mt-3 row-gap-5">
         <Col md={12} lg={7} xl={8}>
-          <Editor structServiceProvider={new StandaloneStructServiceProvider()} onInit={ketcher => {window.ketcher = ketcher}} />
+          <Editor structServiceProvider={structServiceProvider} onInit={ketcher => {window.ketcher = ketcher}} />
         </Col>
 
         <Col md={6} lg={5} xl={4}>

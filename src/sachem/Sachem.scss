@@ -1,20 +1,8 @@
 .sachem-search {
+  // Ketcher 3 takes the height of the row, which the search options make lower than before
   div.Ketcher-root {
     min-width: unset !important;
-    max-height: 600px;
-
-    // top toolbar
-    div.css-1jw7nj {
-      height: 40px;
-      gap: 0px;
-
-      // toolbar button
-      button.css-iw95iu {
-        height: 32px;
-        width: 32px;
-        padding: 4px;
-      }
-    }
+    height: 600px;
   }
 
   // input range
