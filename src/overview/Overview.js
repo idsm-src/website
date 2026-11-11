@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Spinner } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { usePageView } from "../section.js"
+import { KeepSearchContext, SectionContext, usePageView } from "../section.js"
 
 import { SparqlOverview, loadOverview } from "@sib-swiss/sparql-overview";
 import { defaultEndpoint, endpointChoices, optionsFor } from "./config";
@@ -29,6 +29,12 @@ function Overview() {
   const [searchParams] = useSearchParams();
   const endpoint = searchParams.get("endpoint") || defaultEndpoint;
   const navigate = useNavigate();
+
+  // whether the page is shown and how its URL changes while it is not, as an endpoint may finish loading after another
+  // page of the website has been chosen
+  const section = React.useRef({});
+  section.current.shown = React.useContext(SectionContext);
+  section.current.keepSearch = React.useContext(KeepSearchContext);
 
   // the element the overview draws in, which React leaves empty
   const host = React.useRef(null);
@@ -75,8 +81,10 @@ function Overview() {
         });
         shown.current = endpoint;
 
-        if(push)
+        if(push && section.current.shown)
           navigate({ search: searchOf(endpoint) });
+        else if(push)
+          section.current.keepSearch(searchOf(endpoint));
       })
       .catch(error => {
         if(controller.signal.aborted)

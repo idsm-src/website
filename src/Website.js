@@ -8,7 +8,7 @@ import { faAtom, faNetworkWired, faDiagramProject, faDatabase, faHome} from "@fo
 
 import ErrorBoundary from "./ErrorBoundary.js"
 import { initMatomo } from "./matomo.js"
-import { SectionContext } from "./section.js"
+import { KeepSearchContext, SectionContext } from "./section.js"
 
 import idsmLogo from "./logo-idsm.svg";
 import elixirLogo from "./logo-elixir.png";
@@ -194,6 +194,11 @@ function Site() {
     }
   }, [current]);
 
+  // the function of each part changing the search part of its last location while it is hidden, see KeepSearchContext
+  const keepSearch = React.useMemo(() => Object.fromEntries(sections.map(section => [section.path, search =>
+    setVisited(visited => visited[section.path] && visited[section.path].search !== search ?
+      { ...visited, [section.path]: { ...visited[section.path], search, key: "kept" } } : visited)])), []);
+
   // the link of the menu to a part, to its last location
   const linkTo = section => {
     const last = locations[section.path];
@@ -228,13 +233,15 @@ function Site() {
           sections.filter(section => locations[section.path]).map(section =>
             <div key={section.path} className="section" hidden={section !== current}>
               <SectionContext.Provider value={section === current}>
-                <ErrorBoundary>
-                  <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
-                    <Routes location={locations[section.path]}>
-                      <Route path={section.route} element={section.element}/>
-                    </Routes>
-                  </Suspense>
-                </ErrorBoundary>
+                <KeepSearchContext.Provider value={keepSearch[section.path]}>
+                  <ErrorBoundary>
+                    <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
+                      <Routes location={locations[section.path]}>
+                        <Route path={section.route} element={section.element}/>
+                      </Routes>
+                    </Suspense>
+                  </ErrorBoundary>
+                </KeepSearchContext.Provider>
               </SectionContext.Provider>
             </div>
           )
