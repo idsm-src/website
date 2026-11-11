@@ -172,6 +172,28 @@ function Site() {
       setVisited(locations);
   }, [locations, visited]);
 
+  // the scroll position of the window in each part, kept while it is scrolled and restored when it is shown again
+  const scrolls = React.useRef({});
+  const shown = React.useRef(current);
+
+  React.useEffect(() => {
+    const keep = () => {
+      if(shown.current)
+        scrolls.current[shown.current.path] = window.scrollY;
+    };
+
+    window.addEventListener("scroll", keep, { passive: true });
+    return () => window.removeEventListener("scroll", keep);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if(shown.current !== current) {
+      shown.current = current;
+      // at once, though Bootstrap scrolls smoothly
+      window.scrollTo({ top: current ? scrolls.current[current.path] ?? 0 : 0, behavior: "instant" });
+    }
+  }, [current]);
+
   // the link of the menu to a part, to its last location
   const linkTo = section => {
     const last = locations[section.path];
