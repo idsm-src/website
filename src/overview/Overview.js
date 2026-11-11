@@ -24,7 +24,7 @@ function searchOf(endpoint) {
 
 
 function Overview() {
-  usePageView("IDSM / Data overview");
+  usePageView("IDSM / Data Overview");
 
   const [searchParams] = useSearchParams();
   const endpoint = searchParams.get("endpoint") || defaultEndpoint;

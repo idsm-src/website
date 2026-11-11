@@ -144,7 +144,7 @@ function Chemweb() {
 const sections = [
   { path: "/sachem", route: "/sachem/*", element: <Sachem/>, menu: "Sachem GUI", icon: faAtom },
   { path: "/sparql", route: "/sparql/", element: <Sparql/>, menu: "SPARQL GUI", icon: faNetworkWired },
-  { path: "/overview", route: "/overview/", element: <Overview/>, menu: "Data overview", icon: faDiagramProject },
+  { path: "/overview", route: "/overview/", element: <Overview/>, menu: "Data Overview", icon: faDiagramProject },
   { path: "/chemweb", route: "/chemweb/", element: <Chemweb/>, menu: "ChemWebRDF", icon: faDatabase },
   { path: "/", route: "/", element: <Home/> },
 ];
