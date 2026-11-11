@@ -137,22 +137,60 @@ function Chemweb() {
 }
 
 
-function Website() {
+// The parts of the website, each with the path its URLs start with, the routes of its page and its entry in the menu;
+// a part is loaded when it is first visited, and then stays, only hidden while another one is shown, so that it keeps
+// its state
+const sections = [
+  { path: "/sachem", route: "/sachem/*", element: <Sachem/>, menu: "Sachem GUI", icon: faAtom },
+  { path: "/sparql", route: "/sparql/", element: <Sparql/>, menu: "SPARQL GUI", icon: faNetworkWired },
+  { path: "/overview", route: "/overview/", element: <Overview/>, menu: "Data overview", icon: faDiagramProject },
+  { path: "/chemweb", route: "/chemweb/", element: <Chemweb/>, menu: "ChemWebRDF", icon: faDatabase },
+  { path: "/", route: "/", element: <Home/> },
+];
+
+
+// the part a path belongs to, if any
+function sectionOf(pathname) {
+  return sections.find(section => section.path === "/" ? pathname === "/" :
+    pathname === section.path || pathname.startsWith(section.path + "/"));
+}
+
+
+function Site() {
+  const location = useLocation();
+  const current = sectionOf(location.pathname);
+
+  // the last location of each part visited, which its page keeps seeing while hidden, and the menu leads back to
+  const [visited, setVisited] = React.useState({});
+  const locations = React.useMemo(
+    () => current && visited[current.path] !== location ? { ...visited, [current.path]: location } : visited,
+    [current, location, visited]);
+
   React.useEffect(() => {
-    initMatomo();
-  }, []);
+    if(locations !== visited)
+      setVisited(locations);
+  }, [locations, visited]);
+
+  // the link of the menu to a part, to its last location
+  const linkTo = section => {
+    const last = locations[section.path];
+    return last ? { pathname: last.pathname, search: last.search, hash: last.hash } : section.path;
+  };
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark px-3" style={{zIndex:2}}>
         <LinkContainer to="/"><NavbarBrand><img src={idsmLogo} height="32px" alt="IDSM"/></NavbarBrand></LinkContainer>
         <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav activeKey={window.location.pathname} className="mr-auto">
-            <Nav.Link to="/sachem" as={NavLink}><Icon icon={faAtom}/> Sachem GUI</Nav.Link>
-            <Nav.Link to="/sparql" as={NavLink}><Icon icon={faNetworkWired}/> SPARQL GUI</Nav.Link>
-            <Nav.Link to="/overview" as={NavLink}><Icon icon={faDiagramProject}/> Data overview</Nav.Link>
-            <Nav.Link to="/chemweb" as={NavLink}><Icon icon={faDatabase}/> ChemWebRDF</Nav.Link>
+            {
+              sections.filter(section => section.menu).map(section =>
+                <Nav.Link key={section.path} to={linkTo(section)} as={NavLink}>
+                  <Icon icon={section.icon}/> {section.menu}
+                </Nav.Link>
+              )
+            }
           </Nav>
           <Nav className="ms-auto">
             <Nav.Link target="_blank" rel="noreferrer" href="https://bioinformatics.group.uochb.cz/en">
@@ -163,17 +201,19 @@ function Website() {
       </Navbar>
 
       <div className="page">
-        <ErrorBoundary>
-          <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
-            <Routes>
-              <Route path="/sachem/*" element={<Sachem/>}/>
-              <Route path="/sparql/" element={<Sparql/>}/>
-              <Route path="/overview/" element={<Overview/>}/>
-              <Route path="/chemweb/" element={<Chemweb/>}/>
-              <Route path="/" element={<Home/>}/>
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
+        {
+          sections.filter(section => locations[section.path]).map(section =>
+            <div key={section.path} className="section" hidden={section !== current}>
+              <ErrorBoundary>
+                <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
+                  <Routes location={locations[section.path]}>
+                    <Route path={section.route} element={section.element}/>
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+          )
+        }
       </div>
 
       <Container fluid className="pt-1 mt-5 footer">
@@ -200,6 +240,19 @@ function Website() {
           </Col>
         </Row>
       </Container>
+    </>
+  );
+}
+
+
+function Website() {
+  React.useEffect(() => {
+    initMatomo();
+  }, []);
+
+  return (
+    <BrowserRouter>
+      <Site/>
     </BrowserRouter>
   );
 }
