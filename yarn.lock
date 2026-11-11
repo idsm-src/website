@@ -2316,6 +2316,10 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.4.0.tgz#77e948b9760bd22736a5d26e335a690f76fda37b"
   integrity sha512-cEjvTPU32OM9lUFegJagO0mRnIn+rbqrG89vV8/xLnLFX0DoR0r1oy5IlTga71Q7uT3Qus7qm7wgeiMT/+Irlg==
 
+"@sib-swiss/sparql-overview@https://github.com/galgonek/sparql-editor/releases/download/overview-v0.1.0/sib-swiss-sparql-overview-0.1.0.tgz":
+  version "0.1.0"
+  resolved "https://github.com/galgonek/sparql-editor/releases/download/overview-v0.1.0/sib-swiss-sparql-overview-0.1.0.tgz#54f23631644f305eb9dfd70186a783d9f47f6604"
+
 "@sinclair/typebox@^0.24.1":
   version "0.24.51"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.24.51.tgz#645f33fe4e02defe26f2f5c0410e1c094eac7f5f"

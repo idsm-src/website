@@ -4,9 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { trackPageView } from "../matomo.js"
 
-// the build of the package sparql-overview of the IDSM fork of sparql-editor (github.com/galgonek/sparql-editor, branch
-// next, commit 8741ca9), copied from its packages/sparql-overview/dist with the source map
-import { SparqlOverview, loadOverview } from "./sparql-overview";
+import { SparqlOverview, loadOverview } from "@sib-swiss/sparql-overview";
 import { defaultEndpoint, endpointChoices, optionsFor } from "./config";
 
 import "./Overview.scss";

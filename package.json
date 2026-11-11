@@ -9,6 +9,7 @@
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
+    "@sib-swiss/sparql-overview": "https://github.com/galgonek/sparql-editor/releases/download/overview-v0.1.0/sib-swiss-sparql-overview-0.1.0.tgz",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
@@ -41,9 +42,6 @@
       "react-app/jest"
     ]
   },
-  "eslintIgnore": [
-    "src/overview/sparql-overview.js"
-  ],
   "browserslist": {
     "production": [
       ">0.2%",
