@@ -4,16 +4,13 @@ import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import Search from "./Search.js";
 import Results from "./Results.js";
 import { parseHash } from "./hash.js";
-import { trackPageView } from "../matomo.js"
+import { usePageView } from "../section.js"
 
 import "./Sachem.scss"
 
 
 function Sachem() {
-  React.useEffect(() => {
-    document.title = "IDSM / Sachem GUI";
-    trackPageView();
-  }, []);
+  usePageView("IDSM / Sachem GUI");
 
   return (
     <Routes>

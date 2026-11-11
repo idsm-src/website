@@ -4,7 +4,7 @@ import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faBook, faServer, faPlay, faEdit } from "@fortawesome/free-solid-svg-icons";
 import { useAccordionButton } from 'react-bootstrap/AccordionButton';
 
-import { trackPageView } from "../matomo.js"
+import { usePageView } from "../section.js"
 
 import Yasgui from "./Yasgui"
 import Status from "./Status"
@@ -26,10 +26,7 @@ function CustomToggle(props) {
 
 
 function Sparql() {
-  React.useEffect(() => {
-    document.title = "IDSM / SPARQL GUI";
-    trackPageView();
-  }, []);
+  usePageView("IDSM / SPARQL GUI");
 
   const [statusIsOpen, setStatusIsOpen] = React.useState(false);
 

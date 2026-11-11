@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Spinner } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { trackPageView } from "../matomo.js"
+import { usePageView } from "../section.js"
 
 import { SparqlOverview, loadOverview } from "@sib-swiss/sparql-overview";
 import { defaultEndpoint, endpointChoices, optionsFor } from "./config";
@@ -24,10 +24,7 @@ function searchOf(endpoint) {
 
 
 function Overview() {
-  React.useEffect(() => {
-    document.title = "IDSM / Data overview";
-    trackPageView();
-  }, []);
+  usePageView("IDSM / Data overview");
 
   const [searchParams] = useSearchParams();
   const endpoint = searchParams.get("endpoint") || defaultEndpoint;

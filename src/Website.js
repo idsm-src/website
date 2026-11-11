@@ -8,6 +8,7 @@ import { faAtom, faNetworkWired, faDiagramProject, faDatabase, faHome} from "@fo
 
 import ErrorBoundary from "./ErrorBoundary.js"
 import { initMatomo } from "./matomo.js"
+import { SectionContext } from "./section.js"
 
 import idsmLogo from "./logo-idsm.svg";
 import elixirLogo from "./logo-elixir.png";
@@ -204,13 +205,15 @@ function Site() {
         {
           sections.filter(section => locations[section.path]).map(section =>
             <div key={section.path} className="section" hidden={section !== current}>
-              <ErrorBoundary>
-                <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
-                  <Routes location={locations[section.path]}>
-                    <Route path={section.route} element={section.element}/>
-                  </Routes>
-                </Suspense>
-              </ErrorBoundary>
+              <SectionContext.Provider value={section === current}>
+                <ErrorBoundary>
+                  <Suspense fallback={<Spinner animation="border" variant="primary" className="waiting d-block m-auto"/>}>
+                    <Routes location={locations[section.path]}>
+                      <Route path={section.route} element={section.element}/>
+                    </Routes>
+                  </Suspense>
+                </ErrorBoundary>
+              </SectionContext.Provider>
             </div>
           )
         }
