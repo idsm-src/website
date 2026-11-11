@@ -4,7 +4,7 @@ import { Navbar, Nav, NavbarBrand, Container, Row, Col, Modal, Image, Button, Sp
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { LinkContainer } from "react-router-bootstrap"
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-import { faAtom, faNetworkWired, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
+import { faAtom, faNetworkWired, faDiagramProject, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
 
 import ErrorBoundary from "./ErrorBoundary.js"
 import { initMatomo } from "./matomo.js"
@@ -20,6 +20,7 @@ import "./Website.scss";
 const Home = React.lazy(() => import("./home/Home"));
 const Sachem = React.lazy(() => import("./sachem/Sachem"));
 const Sparql = React.lazy(() => import("./sparql/Sparql"));
+const Overview = React.lazy(() => import("./overview/Overview"));
 
 
 function DataPrivacy() {
@@ -150,6 +151,7 @@ function Website() {
           <Nav activeKey={window.location.pathname} className="mr-auto">
             <Nav.Link to="/sachem" as={NavLink}><Icon icon={faAtom}/> Sachem GUI</Nav.Link>
             <Nav.Link to="/sparql" as={NavLink}><Icon icon={faNetworkWired}/> SPARQL GUI</Nav.Link>
+            <Nav.Link to="/overview" as={NavLink}><Icon icon={faDiagramProject}/> Data overview</Nav.Link>
             <Nav.Link to="/chemweb" as={NavLink}><Icon icon={faDatabase}/> ChemWebRDF</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
@@ -166,6 +168,7 @@ function Website() {
             <Routes>
               <Route path="/sachem/*" element={<Sachem/>}/>
               <Route path="/sparql/" element={<Sparql/>}/>
+              <Route path="/overview/" element={<Overview/>}/>
               <Route path="/chemweb/" element={<Chemweb/>}/>
               <Route path="/" element={<Home/>}/>
             </Routes>

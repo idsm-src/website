@@ -41,6 +41,9 @@
       "react-app/jest"
     ]
   },
+  "eslintIgnore": [
+    "src/overview/sparql-overview.js"
+  ],
   "browserslist": {
     "production": [
       ">0.2%",
