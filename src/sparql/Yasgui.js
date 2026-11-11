@@ -4,6 +4,7 @@ import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
 import { escape, getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
 import { endpointBase } from "../config";
+import { SectionContext } from "../section.js";
 
 import "remixicon/fonts/remixicon.css";
 import "./Yasgui.scss";
@@ -207,10 +208,15 @@ function hideZoom() {
 
 class Yasgui extends React.Component {
 
+  // whether the page is shown, see componentDidUpdate()
+  static contextType = SectionContext;
+
+
   constructor(props) {
     super(props);
 
     this.reference = React.createRef();
+    this.shown = true;
   }
 
 
@@ -263,6 +269,17 @@ class Yasgui extends React.Component {
     element.addEventListener("mouseover", showZoom);
     element.addEventListener("mouseout", hideZoom);
     window.addEventListener("scroll", hideZoom, true);
+  }
+
+
+  // CodeMirror measures the editors only while they are shown, so they are measured again when the page is shown
+  // again, as the window may have been resized meanwhile
+  componentDidUpdate() {
+    if(this.context && !this.shown)
+      for(const editor of this.reference.current.querySelectorAll(".CodeMirror"))
+        editor.CodeMirror?.refresh();
+
+    this.shown = this.context;
   }
 
 
