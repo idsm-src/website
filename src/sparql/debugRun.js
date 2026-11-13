@@ -31,6 +31,18 @@ const followTime = 120000;
 let lastNumber = 0;
 
 
+// the response of a call, read as text, as Yasr takes it
+function responseOf(call, content) {
+  const duration = call.endTime != null && call.startTime != null ? call.endTime - call.startTime : undefined;
+
+  const response = call.httpStatus >= 400
+    ? { error: { status: call.httpStatus, statusText: "", text: content.text } }
+    : { data: content.text, contentType: content.contentType || call.contentType?.[0], status: call.httpStatus };
+
+  return { ...response, executionTime: duration, queryStartedTime: call.startTime };
+}
+
+
 // the error of a run that was cancelled, as fetch rejects an aborted request
 function cancelledError() {
   return new DOMException("The query was cancelled", "AbortError");
@@ -643,17 +655,28 @@ class DebugRun {
 
   /*
    * The request or the response of a call as text, at most limit bytes of it, and whether there is more; the debugger
-   * keeps the request as a description of the call, with the query sent. The text is decoded by the charset of its
-   * type, if it has one the browser knows.
+   * keeps the request as a description of the call, with the query sent. The text is decoded as the browser decodes
+   * the response of a query: by the charset of its type, or of an XML document by its declaration, if the browser knows
+   * the encoding. The reading stops when signal aborts it.
    */
-  async content(nodeId, kind, limit) {
-    const response = await fetch(this.contentUrl(nodeId, kind), { credentials: "omit" });
+  async content(nodeId, kind, limit, signal) {
+    const response = await fetch(this.contentUrl(nodeId, kind), { credentials: "omit", signal }).catch(error => {
+      throw error.name === "AbortError" ? error : new Error("The debugger cannot be reached.");
+    });
 
     if(!response.ok)
       throw new Error(`The debugger does not give the ${kind} (HTTP ${response.status}).`);
 
     const type = response.headers.get("Content-Type") ?? "";
-    const charset = /;\s*charset\s*=\s*"?([^";\s]+)/i.exec(type)?.[1];
+    const reader = response.body.getReader();
+    let chunk = await reader.read();
+    let charset = /;\s*charset\s*=\s*"?([^";\s]+)/i.exec(type)?.[1];
+
+    if(!charset && /xml/i.test(type) && chunk.value) {
+      const head = new TextDecoder("latin1").decode(chunk.value.subarray(0, 200));
+      charset = /^\s*<\?xml[^>]*encoding\s*=\s*["']([^"']+)/.exec(head)?.[1];
+    }
+
     let decoder;
 
     try {
@@ -662,16 +685,12 @@ class DebugRun {
       decoder = new TextDecoder();
     }
 
-    const reader = response.body.getReader();
     let text = "";
     let size = 0;
     let truncated = false;
 
-    for(;;) {
-      const { done, value } = await reader.read();
-
-      if(done)
-        break;
+    for(; !chunk.done; chunk = await reader.read()) {
+      const value = chunk.value;
 
       if(size + value.length > limit) {
         text += decoder.decode(value.subarray(0, limit - size), { stream: true });
@@ -699,4 +718,4 @@ class DebugRun {
 }
 
 
-export { DebugRun, RUNNING, SUCCESS, ERROR, CANCELLED };
+export { DebugRun, RUNNING, SUCCESS, ERROR, CANCELLED, responseOf };

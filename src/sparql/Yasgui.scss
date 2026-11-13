@@ -404,6 +404,13 @@ $thin-icons: (
     border-color: $box-border-color;
   }
 
+  // the raw response, and the raw request of a debugged call, are written as the query in the editor is, not in the
+  // larger font of the page, which would be larger than that of the table too
+  .yasr .CodeMirror {
+    font-size: 14px;
+    line-height: 1.5em;
+  }
+
   // every cell draws only its right and bottom lines and the table the top and left ones, as the lines of neighbouring
   // cells would double; the lines between the columns are lighter, the editor used before had none
   .yasr table.dataTable {

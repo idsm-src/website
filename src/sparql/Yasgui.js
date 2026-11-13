@@ -4,6 +4,7 @@ import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
 import { escape, getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
 import { installDebugging } from "./debugging";
+import { downloadResults } from "./download";
 import { endpointBase } from "../config";
 import { SectionContext } from "../section.js";
 
@@ -158,26 +159,6 @@ async function waitForCorsCheck(endpoint) {
 }
 
 
-/*
- * The download button only announces the chosen format and leaves the download to the client of the component, so the
- * results shown in the current tab are saved in that format.
- */
-async function downloadResults(element, format) {
-  const [data, extension] = format === "text/csv"
-    ? [await element.getEmbeddedResultAsCSV(), "csv"]
-    : [JSON.stringify(await element.getEmbeddedResultAsJson(), null, 2), "json"];
-
-  if(!data)
-    return;
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(new Blob([data], { type: format }));
-  link.download = `queryResults.${extension}`;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(link.href));
-}
-
-
 let zoom = null;
 
 
@@ -266,9 +247,13 @@ class Yasgui extends React.Component {
     };
 
     element.addEventListener("shareQuery", event => this.shareQuery(event.detail));
+    // the results shown in the current tab are saved, see download.js
     element.addEventListener("output", event => {
       if(event.detail?.TYPE === "downloadAs")
-        downloadResults(element, event.detail.payload.value);
+        downloadResults({
+          asCsv: () => element.getEmbeddedResultAsCSV(),
+          getAsJson: () => element.getEmbeddedResultAsJson(),
+        }, event.detail.payload.value);
     });
     element.addEventListener("mouseover", showZoom);
     element.addEventListener("mouseout", hideZoom);

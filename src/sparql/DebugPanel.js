@@ -1,27 +1,9 @@
 import React from "react";
-import { Button, Modal, Spinner } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 
 import { RUNNING, SUCCESS, ERROR, CANCELLED } from "./debugRun";
 
 import "./DebugPanel.scss";
-
-
-// how much of a request or a response is shown in its dialog; the whole of it can be saved
-const contentLimit = 256 * 1024;
-
-// the extensions of the files a response is saved in, by its media type
-const extensions = [
-  [/sparql-results\+json|application\/json/, "json"],
-  [/sparql-results\+xml|xml/, "xml"],
-  [/csv/, "csv"],
-  [/tab-separated-values/, "tsv"],
-  [/turtle/, "ttl"],
-  [/n-triples/, "nt"],
-  [/n-quads/, "nq"],
-  [/trig/, "trig"],
-  [/ld\+json/, "jsonld"],
-  [/html/, "html"],
-];
 
 
 // a duration given in milliseconds, as text
@@ -42,12 +24,6 @@ function formatDuration(milliseconds) {
 
 function formatCount(count, noun) {
   return `${count.toLocaleString("en")} ${noun}${count === 1 ? "" : "s"}`;
-}
-
-
-// a message about an error of a request to the debugger: fetch rejects with a TypeError when there is no response
-function messageOf(error) {
-  return error.name === "TypeError" ? "The debugger cannot be reached." : error.message;
 }
 
 
@@ -75,105 +51,26 @@ function StateIcon({ state, settled }) {
 
 
 /*
- * The request or the response of a call in a dialog: the beginning of it, and a button that saves the whole of it. The
- * dialog lies above the page, so it closes when the browser goes back or forth in the history, as another page of the
- * website may be shown then.
+ * A call in the tree, or a group of the calls of one SERVICE clause by the same call, with the calls below it. A call
+ * has a button that shows it in the results of the tab, or hides it again when they show it; the call shown is
+ * marked, or the collapsed item it lies in (see view in DebugPanel).
  */
-function CallContent({ run, call, kind, onHide }) {
-  const [content, setContent] = React.useState(null);
-  const [error, setError] = React.useState(null);
-  const [saving, setSaving] = React.useState(false);
-  const [saveError, setSaveError] = React.useState(null);
-  const titleId = React.useId();
-
-  React.useEffect(() => {
-    let current = true;
-
-    run.content(call.nodeId, kind, contentLimit)
-      .then(content => current && setContent(content))
-      .catch(error => current && setError(messageOf(error)));
-
-    return () => { current = false; };
-  }, [run, call, kind]);
-
-  React.useEffect(() => {
-    window.addEventListener("popstate", onHide);
-    return () => window.removeEventListener("popstate", onHide);
-  }, [onHide]);
-
-  const save = async () => {
-    setSaving(true);
-    setSaveError(null);
-
-    try {
-      const response = await fetch(run.contentUrl(call.nodeId, kind), { credentials: "omit" });
-
-      if(!response.ok)
-        throw new Error(`The debugger does not give the ${kind} (HTTP ${response.status}).`);
-
-      const type = response.headers.get("Content-Type") ?? "";
-      const extension = kind === "request" ? "txt" : extensions.find(([pattern]) => pattern.test(type))?.[1] ?? "txt";
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(await response.blob());
-      link.download = `debug-${run.queryId}-${call.nodeId}-${kind}.${extension}`;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(link.href));
-    } catch(error) {
-      setSaveError(messageOf(error));
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <Modal show size="xl" scrollable onHide={onHide} className="idsm-debug-dialog" aria-labelledby={titleId}>
-      <Modal.Header closeButton>
-        <Modal.Title id={titleId}>
-          {kind === "request" ? "Request to " : "Response of "}
-          <span className="idsm-debug-endpoint">{call.endpoint}</span>
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        {error && <p className="idsm-debug-error">{error}</p>}
-        {!error && !content && <Spinner animation="border" variant="primary" className="d-block m-auto"/>}
-        {!error && content && (
-          <>
-            {content.truncated &&
-              <p className="text-secondary">
-                Only the first {contentLimit / 1024} kB are shown, save the {kind} to see all.
-              </p>}
-            <pre className="idsm-debug-content" tabIndex={0}>{content.text}</pre>
-          </>
-        )}
-      </Modal.Body>
-
-      <Modal.Footer>
-        {saveError && <p className="idsm-debug-error me-auto">{saveError}</p>}
-        <Button variant="primary" onClick={save} disabled={saving}><i className="ri-download-2-line"/> Save</Button>
-        <Button variant="secondary" onClick={onHide}>Close</Button>
-      </Modal.Footer>
-    </Modal>
-  );
-}
-
-
-/*
- * A call in the tree, or a group of the calls of one SERVICE clause by the same call, with the calls below it.
- */
-function TreeItem({ item, snapshot, expanded, onToggle, onShow }) {
+function TreeItem({ item, snapshot, view, expanded, onToggle, onShow, onHide }) {
   const listId = React.useId();
   const data = item.call ?? item.group;
   const settled = snapshot.state !== "starting" && snapshot.state !== "running" && !snapshot.following;
+  const shown = !!item.call && item.call.nodeId === view.shownCall;
+  const loading = !!item.call && view.loading === item.call.nodeId;
   const hasChildren = item.children.length > 0 || item.omitted > 0;
   const isExpanded = hasChildren && (expanded.get(item.key) ?? !item.group);
+  const marked = shown || (!isExpanded && view.path.has(item.key));
   const time = data.endTime != null && data.startTime != null ? formatDuration(data.endTime - data.startTime) : null;
   const results = data.resultsCount != null && (!item.group || data.state !== RUNNING)
     ? formatCount(data.resultsCount, "result") : null;
 
   return (
-    <li className={item.group ? "idsm-debug-group" : undefined}>
-      <div className="idsm-debug-row">
+    <li className={item.group ? "idsm-debug-group" : undefined} aria-current={shown ? "true" : undefined}>
+      <div className={"idsm-debug-row" + (marked ? " idsm-debug-in-results" : "")}>
         {hasChildren
           ? <button type="button" className="idsm-debug-toggle" aria-expanded={isExpanded} aria-controls={listId}
                 aria-label={item.group ? `Calls of the group of ${data.endpoint}`
@@ -200,12 +97,17 @@ function TreeItem({ item, snapshot, expanded, onToggle, onShow }) {
               title={item.group ? "Results of all the calls" : "Results of the response"}>{results}</span>
           </span>
 
-          {/* a group has no request and response, but it keeps the room of their buttons to line up with the calls */}
+          {/* a group cannot be shown, but it keeps the room of the button to line up with the calls */}
           <span className={"idsm-debug-actions" + (item.group ? " invisible" : "")}>
-            <Button variant="link" size="sm" disabled={!item.call || !snapshot.available}
-                onClick={() => onShow(item.call, "request")}>Request</Button>
-            <Button variant="link" size="sm" disabled={!item.call || !snapshot.available || data.state === RUNNING
-                || data.httpStatus == null} onClick={() => onShow(item.call, "response")}>Response</Button>
+            <Button variant="link" size="sm" disabled={!item.call || (!shown && !snapshot.available)}
+                title={shown ? "Show the results of the query again" : "Show the response and the request of the call "
+                  + "in the results below"}
+                aria-label={`${shown ? "Hide" : "Show"} the call of ${data.endpoint}`} aria-busy={loading || undefined}
+                onClick={() => shown ? onHide() : onShow(item.call)}>
+              <span className={shown || loading ? "invisible" : undefined}>Show</span>
+              <span className={!shown || loading ? "invisible" : undefined}>Hide</span>
+              {loading && <Spinner animation="border" size="sm" aria-hidden="true"/>}
+            </Button>
           </span>
         </span>
       </div>
@@ -213,8 +115,8 @@ function TreeItem({ item, snapshot, expanded, onToggle, onShow }) {
       {isExpanded && (
         <ul id={listId}>
           {item.children.map(child =>
-            <TreeItem key={child.key} item={child} snapshot={snapshot} expanded={expanded} onToggle={onToggle}
-              onShow={onShow}/>)}
+            <TreeItem key={child.key} item={child} snapshot={snapshot} view={view} expanded={expanded}
+              onToggle={onToggle} onShow={onShow} onHide={onHide}/>)}
           {item.omitted > 0 &&
             <li className="idsm-debug-omitted">{formatCount(item.omitted, "other call")} not listed</li>}
         </ul>
@@ -254,20 +156,79 @@ function summaryOf(snapshot) {
 }
 
 
+// the keys of the items of the tree that a call lies in: its own, those of its ancestors, and those of their groups
+function pathOf(calls, nodeId) {
+  const keys = new Set();
+
+  for(let call = calls.get(nodeId); call; call = call.parentNodeId != null ? calls.get(call.parentNodeId) : null) {
+    keys.add(`call-${call.nodeId}`);
+
+    if(call.parentNodeId != null)
+      keys.add(`group-${call.parentNodeId}-${call.serviceCallId}`);
+  }
+
+  return keys;
+}
+
+
 /*
  * The calls of a query run through the debugger, as they go on: the call of the endpoint, and below every call the
- * calls of the SERVICE clauses of its query, each with its request and response.
+ * calls of the SERVICE clauses of its query, each with its request and response, which showCall shows in the results
+ * of the tab below in place of the results of the query, also while the query runs; showQueryResults brings them back.
+ * The panel tells which call the results show (shown: the call, and whether its response is shown only in part, which
+ * saveResponse saves whole), if any.
  */
-function DebugPanel({ snapshot, onClose }) {
+function DebugPanel({ snapshot, onClose, shown, showCall, showQueryResults, saveResponse }) {
   const [expanded, setExpanded] = React.useState(() => new Map());
-  const [shown, setShown] = React.useState(null);
+  const [loading, setLoading] = React.useState(null);
+  const [error, setError] = React.useState(null);
+  const section = React.useRef(null);
 
   const toggle = React.useCallback((key, value) => setExpanded(expanded => new Map(expanded).set(key, value)), []);
-  const show = React.useCallback((call, kind) => setShown({ call, kind }), []);
-  const hide = React.useCallback(() => setShown(null), []);
+
+  const show = React.useCallback(async call => {
+    setError(null);
+    setLoading(call.nodeId);
+
+    try {
+      await showCall(call);
+    } catch(error) {
+      console.error(error);
+      setError(`The call cannot be shown: ${error.message}`);
+    } finally {
+      setLoading(current => current === call.nodeId ? null : current);
+    }
+  }, [showCall]);
+
+  const shownCall = shown?.call ?? null;
+  const call = shownCall != null ? snapshot.run.calls.get(shownCall) : null;
+
+  // an error of a call shown before is not kept
+  React.useEffect(() => setError(null), [shownCall]);
+
+  const view = React.useMemo(() => ({ shownCall, loading, path: pathOf(snapshot.run.calls, shownCall) }),
+    [snapshot, shownCall, loading]);
+
+  // the notice with the focused button goes away, so the focus goes to the panel
+  const back = () => {
+    section.current?.focus();
+    showQueryResults();
+  };
+
+  const save = async () => {
+    try {
+      await saveResponse(call);
+    } catch(error) {
+      setError(`The response cannot be saved: ${error.message}`);
+    }
+  };
+
+  const details = call && [call.httpStatus != null ? `HTTP ${call.httpStatus}` : null,
+    call.endTime != null && call.startTime != null ? formatDuration(call.endTime - call.startTime) : null]
+    .filter(detail => detail).join(", ");
 
   return (
-    <section className="idsm-debug" aria-label="Query debugging">
+    <section className="idsm-debug" aria-label="Query debugging" ref={section} tabIndex={-1}>
       <header className="idsm-debug-header">
         <i className="ri-bug-line" aria-hidden="true"/>
         <span className="idsm-debug-title">Query debugging</span>
@@ -282,11 +243,25 @@ function DebugPanel({ snapshot, onClose }) {
 
       {snapshot.root && (
         <ul className="idsm-debug-tree" aria-label="Calls of the endpoints">
-          <TreeItem item={snapshot.root} snapshot={snapshot} expanded={expanded} onToggle={toggle} onShow={show}/>
+          <TreeItem item={snapshot.root} snapshot={snapshot} view={view} expanded={expanded} onToggle={toggle}
+            onShow={show} onHide={showQueryResults}/>
         </ul>
       )}
 
-      {shown && <CallContent run={snapshot.run} call={shown.call} kind={shown.kind} onHide={hide}/>}
+      {error && <p className="idsm-debug-error">{error}</p>}
+
+      <div role="status">
+        {call && (
+          <p className="idsm-debug-shown">
+            <i className="ri-arrow-down-line" aria-hidden="true"/>
+            Below is the call of <span className="idsm-debug-shown-endpoint">{call.endpoint}</span>
+            {details ? ` (${details})` : ""}, its response and its request, not the results of the query.
+            {shown.truncated && " Only the beginning of the response is shown."}
+            {shown.truncated && <Button variant="link" size="sm" onClick={save}>Save the whole response</Button>}
+            <Button variant="link" size="sm" onClick={back}>Show the results of the query</Button>
+          </p>
+        )}
+      </div>
     </section>
   );
 }

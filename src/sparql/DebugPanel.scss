@@ -10,7 +10,7 @@ $secondary-text-color: $gray-600;
 $secondary-text-on-tint-color: $gray-700;
 
 
-// the errors of the panel and of its dialog; the classes of alerts get an icon from the styles of the component
+// the errors of the panel; the classes of alerts get an icon from the styles of the component
 .idsm-debug-error {
   margin: 0;
   padding: .5rem .75rem;
@@ -186,7 +186,11 @@ $secondary-text-on-tint-color: $gray-700;
   .idsm-debug-actions {
     display: flex;
 
+    // the labels Show and Hide and the spinner lie on one another, so that the button keeps the room of the longest of
+    // them and the columns stay in place
     .btn {
+      display: inline-grid;
+      place-items: center;
       padding: 0 .25rem;
       font-size: inherit;
       text-decoration: none;
@@ -194,6 +198,37 @@ $secondary-text-on-tint-color: $gray-700;
       &:hover {
         text-decoration: underline;
       }
+
+      > * {
+        grid-area: 1 / 1;
+      }
+    }
+  }
+
+  // the call that the results below show in place of the results of the query
+  .idsm-debug-row.idsm-debug-in-results, .idsm-debug-row.idsm-debug-in-results:hover {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: inset 3px 0 0 $primary;
+  }
+
+  .idsm-debug-shown {
+    margin: .5rem;
+    color: $secondary-text-on-tint-color;
+
+    i {
+      margin-right: .25rem;
+    }
+
+    .idsm-debug-shown-endpoint {
+      word-break: break-all;
+    }
+
+    .btn {
+      margin-left: .25rem;
+      padding: 0 .25rem;
+      font-size: inherit;
+      vertical-align: baseline;
     }
   }
 
@@ -211,19 +246,5 @@ $secondary-text-on-tint-color: $gray-700;
     .idsm-debug-status, .idsm-debug-time, .idsm-debug-results {
       min-width: 0;
     }
-  }
-}
-
-
-.idsm-debug-dialog {
-  .modal-title .idsm-debug-endpoint {
-    word-break: break-all;
-  }
-
-  .idsm-debug-content {
-    margin: 0;
-    font-size: $font-size-sm;
-    white-space: pre-wrap;
-    word-break: break-word;
   }
 }

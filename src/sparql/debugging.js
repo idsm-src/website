@@ -1,8 +1,10 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
-import { DebugRun } from "./debugRun";
+import { DebugRun, RUNNING, responseOf } from "./debugRun";
 import DebugPanel from "./DebugPanel";
+import { downloadResults, saveFile } from "./download";
 
 
 // the arguments of a request that the debugger forwards, those that the CORS proxy adds, and those of GraphDB, which
@@ -10,6 +12,29 @@ import DebugPanel from "./DebugPanel";
 const forwardedArgs = ["query", "named-graph-uri", "default-graph-uri"];
 const proxyArgs = ["endpoint", "method"];
 const graphdbArgs = ["infer", "sameAs"];
+
+// the plugin of Yasr that shows the request of a call (see addRawRequestPlugin), the name of its view, and how much of
+// the request it shows
+const rawRequest = "raw_request";
+const rawRequestLabel = { en: { [`yasr.plugin_control.plugin.name.${rawRequest}`]: "Raw request" } };
+const requestLimit = 1024 * 1024;
+
+// how much of the response of a call its view shows; a longer one is shown only in part, as text, and can be saved
+const responseLimit = 10 * 1024 * 1024;
+
+// the extensions of the files a response is saved in, by its media type
+const extensions = [
+  [/sparql-results\+json|application\/json/, "json"],
+  [/sparql-results\+xml|xml/, "xml"],
+  [/csv/, "csv"],
+  [/tab-separated-values/, "tsv"],
+  [/turtle/, "ttl"],
+  [/n-triples/, "nt"],
+  [/n-quads/, "nq"],
+  [/trig/, "trig"],
+  [/ld\+json/, "jsonld"],
+  [/html/, "html"],
+];
 
 
 // the debugging of the tabs with a debug run, see leave()
@@ -19,6 +44,21 @@ window.addEventListener("pagehide", () => {
   for(const debugging of debuggings)
     debugging.leave();
 });
+
+
+// Save the whole response of a call as it came, which its view may show only in part
+async function saveResponse(run, call) {
+  const response = await fetch(run.contentUrl(call.nodeId, "response"), { credentials: "omit" }).catch(() => {
+    throw new Error("The debugger cannot be reached.");
+  });
+
+  if(!response.ok)
+    throw new Error(`The debugger does not give the response (HTTP ${response.status}).`);
+
+  const type = response.headers.get("Content-Type") ?? "";
+  const extension = extensions.find(([pattern]) => pattern.test(type))?.[1] ?? "txt";
+  saveFile(await response.blob(), `debug-${run.queryId}-${call.nodeId}-response.${extension}`);
+}
 
 
 // a list of the values of an argument of a request
@@ -118,6 +158,201 @@ function requestOf(tab, yasqe, populated) {
 }
 
 
+// an icon of Font Awesome as an element
+function iconOf({ icon: [width, height, , , path] }) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.setAttribute("aria-hidden", "true");
+
+  const shape = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  shape.setAttribute("d", path);
+  shape.setAttribute("fill", "currentColor");
+  svg.appendChild(shape);
+
+  return svg;
+}
+
+
+/*
+ * Give Yasr a plugin that shows the request of a call, as the debugger describes it, as the raw response shows the
+ * response: in a read-only CodeMirror, drawn once the results are shown, which it measures. The plugin is made from the
+ * plugin of the raw response, which the component registers with its other plugins when it builds Yasgui. The request
+ * comes from the Yasr that shows it, as a promise given by its function idsmRequest, which only the views of calls have
+ * (see callView).
+ */
+function addRawRequestPlugin(Yasr) {
+  if(Yasr.plugins[rawRequest])
+    return;
+
+  const Response = Yasr.plugins.extended_response ?? Yasr.plugins.response;
+  const CodeMirror = Object.getPrototypeOf(window.Yasgui.Yasqe);
+
+  class RawRequest extends Response {
+    label = rawRequest;
+    priority = 0;
+
+    canHandleResults() {
+      return typeof this.yasr.idsmRequest === "function";
+    }
+
+    getIcon() {
+      return iconOf(faPaperPlane);
+    }
+
+    download() {
+      return undefined;
+    }
+
+    // the request is shown once it is read, or why it cannot be, as a warning of the results
+    draw() {
+      const show = () => {
+        // plain text, as the default mode is that of the editor
+        this.cm = CodeMirror(this.yasr.resultsEl, {
+          mode: "text/plain",
+          readOnly: true,
+          lineNumbers: true,
+          lineWrapping: true,
+          value: "",
+          extraKeys: { Tab: false },
+          theme: this.yasr.config.themeName,
+        });
+
+        this.yasr.idsmRequest().then(text => this.cm?.setValue(text),
+          error => this.yasr.showWarning(`The request cannot be shown: ${error.message}`, "error", true));
+      };
+
+      // a later draw replaces the waiting of an earlier one
+      clearInterval(this.isVisibleInterval);
+
+      if(this.yasr.resultsEl.offsetParent !== null) {
+        show();
+        return;
+      }
+
+      this.isVisibleInterval = setInterval(() => {
+        if(this.yasr.resultsEl.offsetParent !== null) {
+          clearInterval(this.isVisibleInterval);
+          this.isVisibleInterval = null;
+          show();
+        }
+      }, 10);
+    }
+
+    destroy() {
+      clearInterval(this.isVisibleInterval);
+      super.destroy?.();
+    }
+  }
+
+  Yasr.plugins[rawRequest] = RawRequest;
+}
+
+
+/*
+ * Give the view of a call the response of the call, read by DebugRun.content, and show the view chosen last in a view
+ * of a call (plugin), or the one of the results of the tab. A response cut at its limit cannot be parsed, so it is
+ * shown as text in the raw response, unless the raw request is chosen. The view draws it at once, unless it is still
+ * being made, as Yasr draws itself after it is made.
+ */
+function setCallResponse(view, call, content, plugin, draw = true) {
+  delete view.plugins.extended_response?.canHandleResults;
+
+  const response = content.truncated
+    ? { data: content.text, contentType: "text/plain", ...timesOf(call) }
+    : responseOf(call, content);
+
+  view.selectPlugin(plugin ?? view.config.defaultPlugin, true);
+
+  if(content.truncated && view.getSelectedPluginName() !== rawRequest)
+    view.selectPlugin("extended_response", true);
+
+  view.setResponse(response, response.executionTime, response.queryStartedTime, undefined, undefined, undefined, draw);
+}
+
+
+// the duration of a call and its start, as Yasr shows them with results
+function timesOf(call) {
+  const { executionTime, queryStartedTime } = responseOf(call, { text: "" });
+  return { executionTime, queryStartedTime };
+}
+
+
+/*
+ * A view of a call shown in an element as the results of the tab are: by Yasr of the same class and with the same
+ * configuration, which renders the cells as the website does, with the view of the raw request after that of the raw
+ * response. It shows the view chosen last in a view of a call (plugin), or the one of the results of the tab, but the
+ * raw request while the call has no response yet (content). Yasr and the tools of its toolbar ask the editor of their
+ * tab about the query, so they get a stand-in of the editor of the tab, which tells that no query runs and gives the
+ * form of the query of the call: the calls of SERVICE clauses are SELECT queries, the root call is the query of the
+ * tab; it does not let them listen to the editor nor change it. An error status is shown as the error of a query is,
+ * and the views stay selectable also then, and for an ASK query. The request is read at once, so that the view keeps
+ * it when the debugger deletes the run.
+ */
+function callView(tab, element, run, call, content, plugin) {
+  const results = tab.getYasr();
+  const Yasr = window.Yasgui.Yasr;
+
+  addRawRequestPlugin(Yasr);
+  results.config.translationService?.addTranslations?.(rawRequestLabel);
+
+  const queryType = call.parentNodeId == null ? run.queryType : "SELECT";
+  const editor = Object.create(tab.getYasqe());
+
+  Object.assign(editor, {
+    config: { ...editor.config, paginationOn: false },
+    on: () => {},
+    off: () => {},
+    emit: () => {},
+    isQueryRunning: () => false,
+    isUpdateQuery: () => false,
+    isAskQuery: () => queryType === "ASK",
+    isExplainPlanQuery: () => false,
+    getQueryType: () => queryType,
+    getQueryMode: () => "query",
+    getPageSize: () => undefined,
+    getPageNumber: () => undefined,
+    setPageSize: () => {},
+    setPageNumber: () => {},
+  });
+
+  const order = results.config.pluginOrder.filter(name => name !== rawRequest);
+  order.splice(order.indexOf("extended_response") + 1, 0, rawRequest);
+
+  const view = new results.constructor(editor, element, {
+    ...results.config,
+    persistenceId: null,
+    fullscreen: false,
+    pluginOrder: order,
+    plugins: { ...results.config.plugins, [rawRequest]: { enabled: true } },
+  });
+
+  const request = run.content(call.nodeId, "request", requestLimit).then(content => content.truncated
+    ? `${content.text}\n… (only the first ${requestLimit / 1024 / 1024} MB of the request are shown)`
+    : content.text);
+
+  request.catch(() => {});
+  view.idsmRequest = () => request;
+
+  // ExtendedYasr hides the views for an ASK query and an error
+  view.updatePluginElementVisibility = () => view.getPluginSelectorsEl()?.classList.remove("hidden");
+
+  // Yasr, made without a response, draws itself after a while, then with the response given here
+  if(content) {
+    setCallResponse(view, call, content, plugin, false);
+  } else {
+    // without a response, the raw response would be empty
+    if(view.plugins.extended_response)
+      view.plugins.extended_response.canHandleResults = () => false;
+
+    view.selectPlugin(rawRequest, true);
+    view.setResponse({ data: "", contentType: "text/plain" }, undefined, undefined, undefined, undefined, undefined,
+      false);
+  }
+
+  return view;
+}
+
+
 /*
  * The debugging of the queries of a tab: a button below the run button that runs the query through the SPARQL debugger
  * (also Ctrl+Shift+Enter or Cmd+Shift+Enter), and a panel between the editor and the results that shows the calls of
@@ -142,6 +377,14 @@ class Debugging {
     this.host = null;
     this.root = null;
 
+    // the view of the call that the results of the tab show in place of the results of the query, see toCall; the
+    // number of the last call asked to be shown, the reading of its response, and the view chosen last in a view of a
+    // call, which the next one shows too
+    this.view = null;
+    this.showing = 0;
+    this.loading = null;
+    this.plugin = null;
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "custom-button idsm-debug-button ri-bug-line";
@@ -163,6 +406,11 @@ class Debugging {
     });
 
     yasqe.on("query", (yasqe, request, populated) => this.query(request, populated));
+
+    // the actions of the panel on the results of the tab
+    this.showCall = call => this.toCall(call);
+    this.showQueryResults = () => this.toQueryResults();
+    this.saveResponse = call => saveResponse(this.run, call);
   }
 
 
@@ -201,6 +449,10 @@ class Debugging {
     const debug = this.debugNext;
     this.debugNext = false;
     this.dispose();
+
+    // the results of the tab show the run
+    this.showing++;
+    this.removeView();
 
     if(!debug) {
       this.hide();
@@ -305,13 +557,195 @@ class Debugging {
   }
 
 
+  // the view of a call that had no response gets it once the call has finished, see completeView
   render(snapshot) {
-    if(this.run === snapshot.run)
-      this.root?.render(<DebugPanel key={snapshot.number} snapshot={snapshot} onClose={() => this.close()}/>);
+    if(this.run !== snapshot.run)
+      return;
+
+    const view = this.view;
+    const call = view && snapshot.run.calls.get(view.call);
+
+    if(view && !view.answered && !view.completing && call?.state !== RUNNING && call?.httpStatus != null)
+      this.completeView(snapshot.run, call, this.showing);
+
+    const shown = view ? { call: view.call, truncated: view.truncated } : null;
+
+    this.root?.render(<DebugPanel key={snapshot.number} snapshot={snapshot} onClose={() => this.close()}
+      shown={shown} showCall={this.showCall} showQueryResults={this.showQueryResults}
+      saveResponse={this.saveResponse}/>);
   }
 
 
-  // the close button of the panel ends the debugging of the tab, also a debug run going on
+  /*
+   * Show a call in the results of the tab, also while the query runs, in the view chosen last in a view of a call (see
+   * callView). The call gets a view of its own in place of the results of the tab, which stay hidden below it, so that
+   * they go on showing the run of the query and then its results, and come back when the panel asks for them, when the
+   * panel is closed and when the tab runs a query again. The view is not kept, so a reload shows the results of the
+   * query too. Its download button saves its own results, which the component would not, as it saves those of the tab.
+   * The response of a call is read before its view shows it, but when the raw request is the view chosen, the request
+   * is shown at once, and the response comes later; only the call asked for last is shown.
+   */
+  async toCall(call) {
+    const run = this.run;
+    const results = this.tab.getYasr?.();
+
+    if(!run || !results)
+      return;
+
+    const ticket = ++this.showing;
+    const answered = call.state !== RUNNING && call.httpStatus != null;
+    let content = null;
+
+    if(answered && this.plugin !== rawRequest) {
+      try {
+        content = await this.readResponse(run, call);
+      } catch(error) {
+        // another call is asked for
+        if(error.name === "AbortError")
+          return;
+
+        throw error;
+      }
+    }
+
+    // the panel may have been closed, another query run, or another call asked for meanwhile
+    if(this.run !== run || this.showing !== ticket)
+      return;
+
+    this.removeView();
+
+    // the component may show the editor only
+    const host = this.yasqe.rootEl.closest("ontotext-yasgui");
+
+    if(host?.classList.contains("mode-yasqe"))
+      Promise.resolve(host.changeRenderMode?.("mode-yasgui")).catch(() => {});
+
+    const element = document.createElement("section");
+    element.className = "idsm-debug-view";
+    results.rootEl.after(element);
+    results.rootEl.style.display = "none";
+
+    let view;
+
+    try {
+      view = callView(this.tab, element, run, call, content, this.plugin);
+    } catch(error) {
+      element.remove();
+      results.rootEl.style.display = "";
+      throw error;
+    }
+
+    // the view chosen in a view of a call is shown for the next call too; Yasr tells about the views chosen, but it
+    // may draw a view it does not offer, as for an error
+    view.on("change", () => {
+      const plugin = view.getSelectedPluginName();
+
+      if(view.plugins[plugin] && !view.plugins[plugin].hideFromSelection)
+        this.plugin = plugin;
+    });
+
+    element.addEventListener("internalDownloadAsEvent", event => {
+      event.stopPropagation();
+      downloadResults(view.results, event.detail?.payload?.value, `debug-${run.queryId}-${call.nodeId}`);
+    });
+
+    // the results of the tab drawn while hidden are drawn again when shown, as tables measure their columns
+    const onDrawn = () => {
+      if(this.view?.results === view)
+        this.view.stale = true;
+    };
+
+    results.on("drawn", onDrawn);
+
+    this.view = {
+      element: element,
+      results: view,
+      call: call.nodeId,
+      answered: !!content,
+      truncated: !!content?.truncated,
+      onDrawn: onDrawn,
+    };
+
+    if(answered && !content)
+      this.completeView(run, call, ticket);
+
+    this.render(run.snapshot);
+    element.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+
+  // the response of a call, at most responseLimit bytes of it; the reading stops when another call is asked for
+  readResponse(run, call) {
+    this.loading?.abort();
+    this.loading = new AbortController();
+
+    return run.content(call.nodeId, "response", responseLimit, this.loading.signal);
+  }
+
+
+  // the view of a call that has no response gets it, unless another call is asked for meanwhile
+  async completeView(run, call, ticket) {
+    const view = this.view;
+    view.completing = true;
+
+    let content;
+
+    try {
+      content = await this.readResponse(run, call);
+    } catch(error) {
+      // the view keeps showing the request
+      return;
+    }
+
+    if(this.view !== view || this.showing !== ticket)
+      return;
+
+    setCallResponse(view.results, call, content, this.plugin);
+    view.answered = true;
+    view.truncated = content.truncated;
+    this.render(run.snapshot);
+  }
+
+
+  // the results of the tab show the results of the query again
+  toQueryResults() {
+    this.showing++;
+    this.removeView();
+
+    if(this.run)
+      this.render(this.run.snapshot);
+  }
+
+
+  removeView() {
+    this.loading?.abort();
+    this.loading = null;
+
+    if(!this.view)
+      return;
+
+    const { element, results: view, onDrawn, stale } = this.view;
+
+    // Yasr draws itself a while after it is made, which it should not do once destroyed
+    view.destroy();
+    view.results = undefined;
+    element.remove();
+    this.view = null;
+
+    const results = this.tab.getYasr?.();
+
+    if(results) {
+      results.removeListener?.("drawn", onDrawn);
+      results.rootEl.style.display = "";
+
+      if(stale)
+        results.refresh();
+    }
+  }
+
+
+  // the close button of the panel ends the debugging of the tab, also a debug run going on, and the results of the tab
+  // show the results of the query again
   close() {
     if(this.yasqe.req?.idsmDebug)
       this.yasqe.abortQuery();
@@ -320,6 +754,7 @@ class Debugging {
     if(this.host?.contains(document.activeElement))
       (this.button.disabled ? this.yasqe : this.button).focus();
 
+    this.toQueryResults();
     this.dispose();
     this.hide();
   }
@@ -350,6 +785,7 @@ class Debugging {
 
 
   destroy() {
+    this.removeView();
     this.dispose();
 
     // the editor is destroyed while Yasgui updates the page, possibly while React renders
