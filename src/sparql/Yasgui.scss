@@ -20,6 +20,9 @@ $editor-blue-light: #9fc4e4;
 $editor-button-size: 36px;
 $editor-icon-size: 31px;
 $run-icon-size: 26px;
+// the buttons of the editor are enlarged and darkened under the pointer, as the component does with most of them
+$hover-scale: 1.2;
+$hover-transition: .15s ease-out;
 // the icons of remixicon on the fullscreen and link buttons, drawn with thinner lines by thin-icon
 $thin-icons: (
   "fullscreen-line": "M8 3V5H4V9H2V3H8ZM2 21V15H4V19H8V21H2ZM22 21H16V19H20V15H22V21ZM22 9H20V5H16V3H22V9Z",
@@ -136,6 +139,8 @@ $thin-icons: (
       padding: 0;
       border: 0;
       background: none;
+      // enlarged under the pointer as the other buttons, which the component gives a transition of all properties
+      transition: transform $hover-transition;
 
       svg {
         display: block;
@@ -159,11 +164,16 @@ $thin-icons: (
           stroke: $primary;
           stroke-width: 2px;
           vector-effect: non-scaling-stroke;
+          transition: stroke $hover-transition;
         }
       }
 
-      &:hover .queryIcon path:not(.loadingIcon) {
-        stroke: $link-hover-color;
+      &:hover {
+        transform: scale($hover-scale);
+
+        .queryIcon path:not(.loadingIcon) {
+          stroke: $link-hover-color;
+        }
       }
 
       .warningIcon {
@@ -248,6 +258,11 @@ $thin-icons: (
     top: 6px;
     font-size: $editor-icon-size;
     font-weight: normal;
+    transition: color $hover-transition, transform $hover-transition;
+
+    &:hover {
+      transform: scale($hover-scale);
+    }
   }
 
   // the tabs look as in the editor used before: underlined labels without boxes and a plain plus that adds a tab
