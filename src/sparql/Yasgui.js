@@ -3,6 +3,7 @@ import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
 
 import { escape, getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
+import { installDebugging } from "./debugging";
 import { endpointBase } from "../config";
 import { SectionContext } from "../section.js";
 
@@ -139,6 +140,9 @@ function configureYasgui(endpoints) {
     button.parentElement?.setAttribute("yasgui-data-tooltip", "");
     button.parentElement?.removeAttribute("aria-label");
   };
+
+  // the debug runs of the queries, see debugging.js
+  installDebugging(Yasgui);
 }
 
 

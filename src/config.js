@@ -6,5 +6,8 @@ const endpointBase = serverBase;
 //const servletBase = serverBase;
 //const endpointBase = serverBase;
 
+// the SPARQL debugger, which runs the debug runs of the SPARQL GUI
+const debuggerBase = "https://idsm-debugger8.dyn.cloud.e-infra.cz";
 
-export { servletBase, endpointBase };
+
+export { servletBase, endpointBase, debuggerBase };

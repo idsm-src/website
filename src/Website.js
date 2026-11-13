@@ -66,6 +66,19 @@ function DataPrivacy() {
             to prevent breaches of that confidentiality.
           </p>
           <p>
+            The debug runs of the SPARQL GUI (the button with the bug below the run button) are an exception. Their
+            queries are not sent to the endpoint directly, but to the <a target="_blank" rel="noreferrer"
+            href="https://github.com/iocbbioinf/sparql_debugger_server">SPARQL Federated Query Debugger</a>, also
+            operated by ELIXIR CZ, which runs in the <a target="_blank" rel="noreferrer"
+            href="https://www.e-infra.cz/en">e-INFRA CZ</a> cloud. The debugger sends the query to the endpoint, and
+            the queries of its SERVICE clauses to their endpoints, and it keeps the requests of all these calls,
+            including the queries and the HTTP headers, and their responses, including the results, so that they can
+            be shown. It may also log the information listed above. The debugger deletes the data of a debug run when
+            the debugging is closed, when another query is run in the same tab, or when the page is left, and
+            otherwise within a day. The data kept by the debugger are not protected against access by its other
+            users, so please do not debug queries whose content or results are confidential.
+          </p>
+          <p>
             ELIXIR CZ does not accept any responsibility for the consequences of any breach of the confidentiality of
             ELIXIR CZ site by third parties who, by any means, gain illegitimate access to the information.
           </p>

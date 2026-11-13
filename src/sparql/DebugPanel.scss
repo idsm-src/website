@@ -1,0 +1,229 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+
+// the lines around the boxes of the editor, see Yasgui.scss
+$box-border-color: #d1d1d1;
+
+// the secondary texts are darker on the tinted backgrounds, so that they keep their contrast
+$secondary-text-color: $gray-600;
+$secondary-text-on-tint-color: $gray-700;
+
+
+// the errors of the panel and of its dialog; the classes of alerts get an icon from the styles of the component
+.idsm-debug-error {
+  margin: 0;
+  padding: .5rem .75rem;
+  border: $border-width solid $danger-border-subtle;
+  border-radius: $border-radius;
+  background-color: $danger-bg-subtle;
+  color: $danger-text-emphasis;
+}
+
+
+/*
+ * The calls of a query run through the debugger, shown between the editor and the results of its tab.
+ */
+.idsm-debug {
+  container-type: inline-size;
+  margin: 4px 0 8px;
+  border: 1px solid $box-border-color;
+  font-size: $font-size-sm;
+
+  .idsm-debug-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .25rem .5rem;
+    background-color: $gray-200;
+
+    .ri-bug-line {
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .idsm-debug-title {
+      font-weight: $font-weight-semibold;
+    }
+
+    .idsm-debug-summary {
+      flex: 1;
+      color: $secondary-text-on-tint-color;
+    }
+
+    .btn-close {
+      font-size: .75rem;
+    }
+  }
+
+  > .idsm-debug-error, > .idsm-debug-note {
+    margin: .5rem;
+  }
+
+  .idsm-debug-note {
+    color: $secondary-text-color;
+
+    i {
+      margin-right: .25rem;
+    }
+  }
+
+  // the tree scrolls by itself, as the calls of a SERVICE clause may be many
+  .idsm-debug-tree {
+    max-height: 45vh;
+    margin: 0;
+    padding: .25rem .5rem;
+    overflow: auto;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  li > ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+
+  // the details of a call follow its endpoint, or go on the next line when the row is too narrow
+  .idsm-debug-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: .5rem;
+    min-height: 1.75rem;
+    border-radius: $border-radius-sm;
+
+    // a darker background would lower the contrast of the texts of the row
+    &:hover {
+      box-shadow: inset 2px 0 0 $gray-400;
+    }
+  }
+
+  // the room kept by the buttons of a group takes no height when it wraps onto a line of its own
+  .idsm-debug-actions.invisible {
+    height: 0;
+    overflow: hidden;
+  }
+
+  // the group of the calls of a SERVICE clause has a tint of its own, as in the debugger
+  .idsm-debug-group > .idsm-debug-row {
+    background-color: rgba($warning, .15);
+
+    &:hover {
+      background-color: rgba($warning, .25);
+    }
+
+    .idsm-debug-details {
+      color: $secondary-text-on-tint-color;
+    }
+  }
+
+  .idsm-debug-toggle {
+    flex: none;
+    width: 1.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: $secondary-text-color;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .idsm-debug-state {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  .spinner-border.idsm-debug-state {
+    --bs-spinner-border-width: .15em;
+    color: $primary;
+  }
+
+  .idsm-debug-endpoint {
+    flex: 1 1 12rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .idsm-debug-info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    column-gap: .75rem;
+    margin-left: auto;
+  }
+
+  // the details of the calls line up in columns, as far as their texts are of the usual lengths
+  .idsm-debug-details {
+    display: flex;
+    gap: .75rem;
+    color: $secondary-text-color;
+    white-space: nowrap;
+
+    > span {
+      text-align: right;
+    }
+
+    .idsm-debug-status {
+      min-width: 4.5rem;
+    }
+
+    .idsm-debug-time {
+      min-width: 3.5rem;
+    }
+
+    .idsm-debug-results {
+      min-width: 5.5rem;
+    }
+  }
+
+  .idsm-debug-actions {
+    display: flex;
+
+    .btn {
+      padding: 0 .25rem;
+      font-size: inherit;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .idsm-debug-omitted {
+    padding: .25rem 0 .25rem 2.75rem;
+    color: $secondary-text-color;
+    font-style: italic;
+  }
+}
+
+
+// in a narrow panel the details take only the room they need
+@container (max-width: 40rem) {
+  .idsm-debug .idsm-debug-details {
+    .idsm-debug-status, .idsm-debug-time, .idsm-debug-results {
+      min-width: 0;
+    }
+  }
+}
+
+
+.idsm-debug-dialog {
+  .modal-title .idsm-debug-endpoint {
+    word-break: break-all;
+  }
+
+  .idsm-debug-content {
+    margin: 0;
+    font-size: $font-size-sm;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
