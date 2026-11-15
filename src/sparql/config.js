@@ -1,5 +1,6 @@
 import { endpointBase } from "../config";
 import { idn } from "../tag.js"
+import chemwebVisualizer from "./chemwebVisualizer";
 
 
 const corsProxy = endpointBase + "/sparql/endpoint/proxy";
@@ -103,4 +104,8 @@ const endpoints = [{
 ];
 
 
-export { corsProxy, defaultEndpoint, defaultQuery, endpoints };
+// the visualizers of the IRIs in the results table, see visualization.js
+const visualizers = [chemwebVisualizer];
+
+
+export { corsProxy, defaultEndpoint, defaultQuery, endpoints, visualizers };

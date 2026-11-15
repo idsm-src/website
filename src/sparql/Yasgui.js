@@ -1,10 +1,11 @@
 import React from "react";
 import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
 
-import { escape, getCellContent } from "./cellContent";
+import { getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
 import { installDebugging } from "./debugging";
 import { downloadResults } from "./download";
+import { escape } from "./escape";
 import { endpointBase } from "../config";
 import { SectionContext } from "../section.js";
 
@@ -163,8 +164,8 @@ let zoom = null;
 
 
 /*
- * The cells and the wrapper of the table clip their content, so the enlarged image of a compound is shown above the
- * page instead of being scaled in its cell.
+ * The cells and the wrapper of the table clip their content, so the enlarged image of a visualization (a compound, as
+ * a rule) is shown above the page instead of being scaled in its cell.
  */
 function showZoom(event) {
   const image = event.target.closest("img.zoomable");

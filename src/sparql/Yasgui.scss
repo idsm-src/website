@@ -514,8 +514,8 @@ ontotext-dialog-web-component, confirmation-dialog {
 }
 
 
-// the images and charts of a cell sit beside its term, which is a single flex item, so that the spaces between the
-// parts of the term stay
+// the visualization of a cell (see visualization.js) sits beside its term, which is a single flex item, so that the
+// spaces between the parts of the term stay
 #root ontotext-yasgui .idsm-cell {
   display: flex;
   align-items: center;
@@ -526,7 +526,16 @@ ontotext-dialog-web-component, confirmation-dialog {
     white-space: pre-wrap;
   }
 
+  idsm-visualization {
+    display: flex;
+    align-items: center;
+  }
+
+  // the boxes of the images and charts of chemwebVisualizer.js; its placeholders are empty boxes of the same classes
   .ms-chart {
+    display: inline-block;
+    width: 100px;
+    height: 60px;
     border: none;
     pointer-events: none;
     vertical-align: middle;
@@ -579,8 +588,8 @@ ontotext-dialog-web-component, confirmation-dialog {
     white-space: nowrap;
   }
 
-  // the images of compounds and the charts of spectra would keep the rows high
-  .zoomable, .ms-chart {
+  // the visualizations would keep the rows high; hidden, they are not asked for
+  idsm-visualization {
     display: none;
   }
 }
