@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route, Navigate, useParams } from "react-router-dom";
 
-import Search from "./Search.js";
-import Results from "./Results.js";
+import Search from "./Search.jsx";
+import Results from "./Results.jsx";
 import { parseHash } from "./hash.js";
 import { usePageView } from "../section.js"
 

@@ -1,5 +1,7 @@
 import React from "react";
-import { defineCustomElements } from "ontotext-yasgui-web-component/loader";
+// the custom elements build, which holds Yasgui; the lazy loader imports its parts by computed paths, which a bundler
+// cannot follow
+import * as yasguiElements from "ontotext-yasgui-web-component/dist/components/index.js";
 
 import { getCellContent } from "./cellContent";
 import { corsProxy } from "./config";
@@ -13,7 +15,11 @@ import "remixicon/fonts/remixicon.css";
 import "./Yasgui.scss";
 
 
-defineCustomElements(window);
+// Yasgui creates some of the elements itself, so all of them are defined, not only those the template of the main one
+// uses
+for(const [name, define] of Object.entries(yasguiElements))
+  if(name.startsWith("defineCustomElement"))
+    define();
 
 
 const hiddenPlugins = ["pivot-table-plugin", "charts", "geo", "explain-plan"];
@@ -209,8 +215,7 @@ class Yasgui extends React.Component {
   async componentDidMount() {
     const element = this.reference.current;
 
-    await customElements.whenDefined("ontotext-yasgui");
-    await element.componentOnReady();
+    // the custom elements build defines the element and Yasgui (window.Yasgui) once it is imported
 
     configureYasgui(this.props.endpoints);
 

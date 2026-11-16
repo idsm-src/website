@@ -6,7 +6,7 @@ import { LinkContainer } from "react-router-bootstrap"
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faAtom, faNetworkWired, faDiagramProject, faDatabase, faHome} from "@fortawesome/free-solid-svg-icons";
 
-import ErrorBoundary from "./ErrorBoundary.js"
+import ErrorBoundary from "./ErrorBoundary.jsx"
 import { initMatomo } from "./matomo.js"
 import { KeepSearchContext, SectionContext } from "./section.js"
 
