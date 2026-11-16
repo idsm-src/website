@@ -1,6 +1,7 @@
 import { endpointBase } from "../config";
 import { idn } from "../tag.js"
 import chemwebVisualizer from "./chemwebVisualizer";
+import createTemplateVisualizer from "./templateVisualizer";
 
 
 const corsProxy = endpointBase + "/sparql/endpoint/proxy";
@@ -104,8 +105,16 @@ const endpoints = [{
 ];
 
 
-// the visualizers of the IRIs in the results table, see visualization.js
-const visualizers = [chemwebVisualizer];
+// the sources of the templates of templateVisualizer.js: the addresses of RDF documents or SPARQL endpoints holding
+// them; the templates are code run in the page, so only trusted sources may be listed
+const templateSources = [];
+
+
+// the visualizers of the IRIs in the results table, see visualization.js; the templates visualize the IRIs that the
+// visualizers before them do not
+const visualizers = templateSources.length > 0
+  ? [chemwebVisualizer, createTemplateVisualizer(templateSources)]
+  : [chemwebVisualizer];
 
 
 export { corsProxy, defaultEndpoint, defaultQuery, endpoints, visualizers };

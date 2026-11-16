@@ -13,9 +13,11 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@comunica/query-sparql": "^5.0.0",
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "@fortawesome/react-fontawesome": "^3.5.0",
+    "@idsm-src/template-renderer": "https://github.com/surilindur/template-renderer#390662507675e76676d8e3c51d6f2516f77ef72d",
     "@sib-swiss/sparql-overview": "https://github.com/galgonek/sparql-editor/releases/download/overview-v0.1.0/sib-swiss-sparql-overview-0.1.0.tgz",
     "bootstrap": "^5.3.8",
     "events": "^3.3.0",

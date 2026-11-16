@@ -10,6 +10,13 @@ export default defineConfig({
     global: "globalThis",
     "process.env.NODE_DEBUG": "undefined",
   },
+  resolve: {
+    alias: [
+      // the template renderer imports the build of Eta for Node.js, which reads templates from files as well; it renders
+      // templates given as text only, which the build for browsers does too
+      { find: /^eta$/, replacement: "eta/core" },
+    ],
+  },
   build: {
     // the directory the website is deployed from
     outDir: "build",

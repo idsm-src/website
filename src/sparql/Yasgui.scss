@@ -549,6 +549,22 @@ ontotext-dialog-web-component, confirmation-dialog {
     vertical-align: middle;
     margin-right: 0.5em;
   }
+
+  // the box of a visualization of templateVisualizer.js, which is HTML of any kind, so its text is not broken as an IRI
+  .idsm-template {
+    margin-right: 0.5em;
+    word-break: normal;
+    overflow-wrap: break-word;
+    hyphens: manual;
+
+    // the template renderer shows so the error of a template
+    pre.error {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: .875em;
+      color: $danger;
+    }
+  }
 }
 
 
