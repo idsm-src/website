@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 
@@ -20,6 +22,15 @@ $editor-blue-light: #9fc4e4;
 $editor-button-size: 36px;
 $editor-icon-size: 31px;
 $run-icon-size: 26px;
+// the outline of the play icon, which is 81.9 units of its view box high; it is drawn in those units, as the dashes of
+// its animation are fractions of its length only then
+$run-icon-height: 81.9;
+$run-outline-width: 2px;
+// the icon of the debug button, drawn by lines in a view box of 24 units: the body of the bug is smaller than the other
+// icons, so the icon is larger, as large as its button; curved and slanted lines look thicker than straight ones, so its
+// lines are a little thinner than those of the other icons
+$debug-icon-size: $editor-button-size;
+$debug-line-width: 1.9px;
 // the buttons of the editor are enlarged and darkened under the pointer, as the component does with most of them
 $hover-scale: 1.2;
 $hover-transition: .15s ease-out;
@@ -37,15 +48,6 @@ $thin-icons: (
     + "C8.98678 7.94227 8.98678 11.1081 10.9394 13.0607L12.3536 14.4749L10.9394 15.8891L9.52518 14.4749"
     + "C6.79151 11.7413 6.79151 7.30911 9.52518 4.57544L9.87874 4.22188"
     + "C12.6124 1.48821 17.0446 1.48821 19.7782 4.22188C22.5119 6.95555 22.5119 11.3877 19.7782 14.1214Z",
-  "bug-line": "M13 19.9C15.2822 19.4367 17 17.419 17 15V12C17 11.299 16.8564 10.6219 16.5846 10H7.41538"
-    + "C7.14358 10.6219 7 11.299 7 12V15C7 17.419 8.71776 19.4367 11 19.9V14H13V19.9ZM5.5358 17.6907"
-    + "C5.19061 16.8623 5 15.9534 5 15H2V13H5V12C5 11.3573 5.08661 10.7348 5.2488 10.1436L3.0359 8.86602"
-    + "L4.0359 7.13397L6.05636 8.30049C6.11995 8.19854 6.18609 8.09835 6.25469 8H17.7453"
-    + "C17.8139 8.09835 17.88 8.19854 17.9436 8.30049L19.9641 7.13397L20.9641 8.86602L18.7512 10.1436"
-    + "C18.9134 10.7348 19 11.3573 19 12V13H22V15H19C19 15.9534 18.8094 16.8623 18.4642 17.6907"
-    + "L20.9641 19.134L19.9641 20.866L17.4383 19.4077C16.1549 20.9893 14.1955 22 12 22"
-    + "C9.80453 22 7.84512 20.9893 6.56171 19.4077L4.0359 20.866L3.0359 19.134L5.5358 17.6907Z"
-    + "M8 6C8 3.79086 9.79086 2 12 2C14.2091 2 16 3.79086 16 6H8Z",
 );
 
 
@@ -88,8 +90,8 @@ $thin-icons: (
   }
 
   // the run button is the play icon at the top of the editor, as in the editor used before, with the other buttons
-  // below it and in their colours; its second outline runs around it during a query, and an invalid query gets a
-  // warning
+  // below it and in their colours; it is only an outline, which runs around during a query, which the button cancels
+  // then, and an invalid query gets a warning
   .yasqe_buttons {
     align-items: flex-end;
     gap: 2px;
@@ -103,13 +105,35 @@ $thin-icons: (
       order: -1;
     }
 
-    // the button of the debug runs follows the run button, and pulses during a debug run, which it cancels then; the
-    // component dims a disabled button only while it is hovered
+    // the button of the debug runs follows the run button; its icon is drawn by lines (see debugging.js), and during a
+    // debug run, which the button cancels then, half of the outline of the body of the bug runs around as the outline
+    // of the run button does; the component dims a disabled button only while it is hovered
     .idsm-debug-button {
       order: -1;
 
-      &.busy {
-        animation: idsm-debug-busy 1.2s ease-in-out infinite;
+      svg {
+        display: block;
+        width: $debug-icon-size;
+        height: $debug-icon-size;
+        margin: auto;
+        overflow: visible;
+      }
+
+      path {
+        fill: none;
+        stroke: currentColor;
+        stroke-width: math.div($debug-line-width, $debug-icon-size) * 24;
+      }
+
+      .idsm-bug-head {
+        fill: currentColor;
+        stroke: none;
+      }
+
+      &.busy .idsm-bug-body {
+        stroke-dasharray: 50;
+        stroke-linecap: round;
+        animation: idsm-running-outline 1.5s linear infinite;
       }
 
       &:disabled, &:disabled:hover {
@@ -159,11 +183,10 @@ $thin-icons: (
           overflow: visible;
         }
 
-        path:not(.loadingIcon) {
-          fill: tint-color($primary, 90%);
+        path {
+          fill: none;
           stroke: $primary;
-          stroke-width: 2px;
-          vector-effect: non-scaling-stroke;
+          stroke-width: math.div($run-outline-width, $run-icon-size) * $run-icon-height;
           transition: stroke $hover-transition;
         }
       }
@@ -171,7 +194,7 @@ $thin-icons: (
       &:hover {
         transform: scale($hover-scale);
 
-        .queryIcon path:not(.loadingIcon) {
+        .queryIcon path {
           stroke: $link-hover-color;
         }
       }
@@ -193,11 +216,12 @@ $thin-icons: (
         display: block;
       }
 
-      &.busy .loadingIcon {
-        stroke: $primary;
-        stroke-width: 8px;
-        stroke-dasharray: 100;
-        animation: idsm-query-busy 1.5s linear infinite;
+      // half of the outline runs around, the length of the outline being given as 100, with ends as round as the
+      // corners
+      &.busy .queryIcon path {
+        stroke-dasharray: 50;
+        stroke-linecap: round;
+        animation: idsm-running-outline 1.5s linear infinite;
       }
     }
   }
@@ -611,15 +635,9 @@ ontotext-dialog-web-component, confirmation-dialog {
 }
 
 
-@keyframes idsm-query-busy {
+// half of an outline whose length is given as 100 runs around it, clockwise when the outline is drawn anticlockwise
+@keyframes idsm-running-outline {
   to {
-    stroke-dashoffset: 200;
-  }
-}
-
-
-@keyframes idsm-debug-busy {
-  50% {
-    opacity: .35;
+    stroke-dashoffset: 100;
   }
 }

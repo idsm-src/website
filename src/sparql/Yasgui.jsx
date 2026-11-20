@@ -25,16 +25,13 @@ for(const [name, define] of Object.entries(yasguiElements))
 const hiddenPlugins = ["pivot-table-plugin", "charts", "geo", "explain-plan"];
 
 
-// the icons of the run button of the editor used before: the play icon, whose second outline runs around it during
-// a query, and the warning about an invalid query
+// the icons of the run button of the editor used before: the outline of the play icon, which runs around during a
+// query (its length is given, so that the dashes of the animation are fractions of it), and the warning about an
+// invalid query
 const queryIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72.900002 81.900002" aria-hidden="true">'
-  + '<path d="m69.6 35.2-60.3-34.3c-2.2-1.2-4.4-1.2-6.4 0s-2.9 3.4-2.9 5.6v68.8c0 2.2 1.2 4.4 2.9 5.6 1 0.5'
+  + '<path pathLength="100"'
+  + ' d="m69.6 35.2-60.3-34.3c-2.2-1.2-4.4-1.2-6.4 0s-2.9 3.4-2.9 5.6v68.8c0 2.2 1.2 4.4 2.9 5.6 1 0.5'
   + ' 2.2 1 3.4 1s2.2-0.5 2.9-1l60.3-34.3c2.2-1.2 3.4-3.4 3.4-5.6s-1.1-4.3-3.3-5.8z"/>'
-  + '<path class="loadingIcon" fill="none"'
-  + ' d="m61.184 36.167-48.73-27.719c-1.7779-0.96976-3.5558-0.96976-5.172 0-1.6163 0.96976-2.3436'
-  + ' 2.7476-2.3436 4.5255v55.599c0 1.7779 0.96976 3.5558 2.3436 4.5255 0.80813 0.40407 1.7779'
-  + ' 0.80813 2.7476 0.80813 0.96975 0 1.7779-0.40406 2.3436-0.80813l48.73-27.719c1.7779-0.96976'
-  + ' 2.7476-2.7476 2.7476-4.5255s-0.88894-3.475-2.6668-4.6872z"/>'
   + '</svg>';
 
 const warningIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 66.399998 66.399998" aria-hidden="true"><g>'
@@ -129,9 +126,10 @@ function configureYasgui(endpoints) {
     postprocessHints: showInsertedText
   });
 
-  // the run button shows the icons of the editor used before (see Yasgui.scss); it sets its label at each update, so
-  // the icons replace the label afterwards; its tooltip, which offers the hidden menu of the button, is dropped, as it
-  // is shown only when it has a text, and an empty translation falls back to the default one
+  // the run button shows the icons of the editor used before (see Yasgui.scss); it sets its label at each update, also
+  // while the editor is edited, so the icons replace the label once and the label is not set any more, which would
+  // replace the icons and start their animation anew; its tooltip, which offers the hidden menu of the button, is
+  // dropped, as it is shown only when it has a text, and an empty translation falls back to the default one
   const updateQueryButton = Yasqe.prototype.updateQueryButton;
   Yasqe.prototype.updateQueryButton = function(...args) {
     updateQueryButton.apply(this, args);
@@ -141,10 +139,36 @@ function configureYasgui(endpoints) {
     if(!button)
       return;
 
-    button.innerHTML = `<div class="svgImg queryIcon">${queryIcon}</div>`
-      + `<div class="svgImg warningIcon">${warningIcon}</div>`;
-    button.title = "Run query";
-    button.setAttribute("aria-label", "Run query");
+    if(!button.idsmIcons) {
+      button.idsmIcons = true;
+      button.innerHTML = `<div class="svgImg queryIcon">${queryIcon}</div>`
+        + `<div class="svgImg warningIcon">${warningIcon}</div>`;
+
+      const innerText = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "innerText");
+      Object.defineProperty(button, "innerText", { configurable: true, get: innerText.get, set: () => {} });
+
+      // the button cancels the query it has started, as the debug button does its debug run (see debugging.js); the
+      // second click of a double click would cancel the query that the first one started
+      button.onclick = event => {
+        if(this.config.queryingDisabled || event.detail > 1)
+          return;
+
+        if(this.req && !this.req.idsmDebug) {
+          this.abortQuery();
+        } else {
+          this.pageNumber = 1;
+          this.query().catch(() => {});
+        }
+      };
+    }
+
+    // the component marks the button busy during every run, but a debug run is shown by the debug button
+    const running = !!this.req && !this.req.idsmDebug;
+    const label = running ? "Cancel the query" : "Run query";
+
+    button.classList.toggle("busy", running);
+    button.title = label;
+    button.setAttribute("aria-label", label);
     button.parentElement?.setAttribute("yasgui-data-tooltip", "");
     button.parentElement?.removeAttribute("aria-label");
   };

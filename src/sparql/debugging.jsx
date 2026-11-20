@@ -22,6 +22,19 @@ const requestLimit = 1024 * 1024;
 // how much of the response of a call its view shows; a longer one is shown only in part, as text, and can be saved
 const responseLimit = 10 * 1024 * 1024;
 
+// the icon of the debug button: the bug of remixicon (bug-line) drawn along the middles of its lines, which end .2
+// units inside the ends of the lines of the glyph, as those of the other icons of the editor do (see thin-icon in
+// Yasgui.scss, which gives the size of the icon and the width of its lines); so the outline of its body can run around
+// during a debug run as the outline of the run button does (see Yasgui.js), its length being given, so that the dashes
+// of the animation are fractions of it
+const bugIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">'
+  + '<path class="idsm-bug-body" pathLength="100"'
+  + ' d="M17.196 9H6.804A6 6 0 0 0 6 12V15A6 6 0 0 0 18 15V12A6 6 0 0 0 17.196 9Z"/>'
+  + '<path d="M2.2 14H6M18 14H21.8M3.709 8.1 6.134 9.5M20.291 8.1 17.866 9.5M3.709 19.9 6.567 18.25'
+  + 'M20.291 19.9 17.433 18.25M12 14.2V21"/>'
+  + '<path class="idsm-bug-head" d="M8.205 5.8A3.8 3.8 0 0 1 15.795 5.8Z"/>'
+  + '</svg>';
+
 // the extensions of the files a response is saved in, by its media type
 const extensions = [
   [/sparql-results\+json|application\/json/, "json"],
@@ -361,7 +374,8 @@ function callView(tab, element, run, call, content, plugin) {
  *
  * A debug run is a normal run of the editor whose request is not sent: the debugger runs the query, and the response
  * of the endpoint it gives is handed to the request as if it came from the endpoint, so the editor and the results
- * show the run as any other, and the run button and closing the tab abort it as any other.
+ * show the run as any other, and another run and closing the tab abort it as any other. Only the debug button shows
+ * that the run goes on, and cancels it then, as the run button does with a normal run (see Yasgui.js).
  */
 class Debugging {
 
@@ -387,7 +401,8 @@ class Debugging {
 
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "custom-button idsm-debug-button ri-bug-line";
+    button.className = "custom-button idsm-debug-button";
+    button.innerHTML = bugIcon;
 
     // the second click of a double click would cancel the run that the first one started
     button.addEventListener("click", event => {
@@ -519,7 +534,10 @@ class Debugging {
 
     this.show();
     this.render(run.snapshot);
-    this.updateButton();
+
+    // the editor has updated its buttons before the run was marked as a debug run, and the run is shown only on the
+    // debug button (see updateButton, called on each update of the run button)
+    yasqe.updateQueryButton();
   }
 
 
